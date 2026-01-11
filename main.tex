@@ -1,0 +1,1520 @@
+\documentclass[11pt,a4paper]{article}
+
+% -------------------------------------------------
+% Packages
+% -------------------------------------------------
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{hyperref}
+
+
+% -------------------------------------------------
+% Fancy colored theorem environments with tcolorbox
+% + optional titles: \begin{theorem}[Name] ... \end{theorem}
+% Title text = white for readability
+% -------------------------------------------------
+\usepackage{xcolor}
+\usepackage{xparse}
+\usepackage[most]{tcolorbox}
+\usepackage{etoolbox}
+
+
+\tcbuselibrary{theorems,breakable,skins}
+
+% --- Color palette (tweak RGB if you like) ---
+\definecolor{ThmNavy}{RGB}{12, 35, 64}     % theorem (darkest)
+\definecolor{PropBlue}{RGB}{23, 79, 145}   % proposition
+\definecolor{LemBlue}{RGB}{70, 130, 180}   % lemma
+\definecolor{CorNavy}{RGB}{18, 55, 95}     % corollary
+
+\definecolor{DefBlue}{RGB}{40, 95, 140}    % definition
+\definecolor{ExBlue}{RGB}{55, 115, 165}    % example
+\definecolor{RemGray}{RGB}{90, 90, 90}     % remark
+
+% --- Common box geometry ---
+\tcbset{
+  mybox/.style={
+    enhanced, breakable,
+    boxrule=0.9pt, arc=2mm,
+    left=2mm, right=2mm, top=1mm, bottom=1mm,
+    fonttitle=\bfseries,
+    coltitle=white,        % <-- white title text
+    coltext=black!95,      % <-- readable body text
+  },
+  % helper: light body background + dark title bar
+  mycolors/.style={
+    colframe=#1,
+    colback=#1!4,
+    colbacktitle=#1,       % dark title background
+  }
+}
+
+% ---------- Boxed base environments (do NOT use directly) ----------
+
+\newtcbtheorem[number within=section]{theorembox}{Theorem}%
+{mybox, mycolors=ThmNavy}{thm}
+
+\newtcbtheorem[use counter from=theorembox]{lemmabox}{Lemma}%
+{mybox, mycolors=LemBlue}{lem}
+
+\newtcbtheorem[use counter from=theorembox]{propositionbox}{Proposition}%
+{mybox, mycolors=PropBlue}{prop}
+
+\newtcbtheorem[use counter from=theorembox]{corollarybox}{Corollary}%
+{mybox, mycolors=CorNavy}{cor}
+
+\newtcbtheorem[use counter from=theorembox]{definitionbox}{Definition}%
+{mybox, mycolors=DefBlue, fontupper=\normalfont}{def}
+
+\newtcbtheorem[use counter from=theorembox]{examplebox}{Example}%
+{mybox, mycolors=ExBlue, fontupper=\normalfont}{ex}
+
+\newtcbtheorem[use counter from=theorembox]{remarkbox}{Remark}%
+{enhanced, breakable,
+  boxrule=0pt, frame hidden,   % no border
+  colback=white,               % no background tint
+  left=0pt, right=0pt, top=0.5mm, bottom=0.5mm,
+  fonttitle=\itshape,
+  coltitle=black!70,
+  fontupper=\normalfont,
+}{rem}
+
+
+% Define a borderless proof box
+\newtcolorbox{proofboxauto}[1][]{%
+  enhanced, breakable,
+  boxrule=0pt, frame hidden,
+  arc=2mm,
+  left=2mm, right=2mm, top=1mm, bottom=1mm,
+  colback=blue!12,
+  coltext=black!95,
+  #1
+}
+
+% Patch amsthm proof to be inside the box
+\AtBeginEnvironment{proof}{\begin{proofboxauto}}
+\AtEndEnvironment{proof}{\end{proofboxauto}}
+
+% ---------- User-facing environments with optional [title] ----------
+
+\NewDocumentEnvironment{theorem}{o}
+{\begin{theorembox}{\IfValueTF{#1}{#1}{}}{}}
+{\end{theorembox}}
+
+\NewDocumentEnvironment{lemma}{o}
+{\begin{lemmabox}{\IfValueTF{#1}{#1}{}}{}}
+{\end{lemmabox}}
+
+\NewDocumentEnvironment{proposition}{o}
+{\begin{propositionbox}{\IfValueTF{#1}{#1}{}}{}}
+{\end{propositionbox}}
+
+\NewDocumentEnvironment{corollary}{o}
+{\begin{corollarybox}{\IfValueTF{#1}{#1}{}}{}}
+{\end{corollarybox}}
+
+\NewDocumentEnvironment{definition}{o}
+{\begin{definitionbox}{\IfValueTF{#1}{#1}{}}{}}
+{\end{definitionbox}}
+
+\NewDocumentEnvironment{example}{o}
+{\begin{examplebox}{\IfValueTF{#1}{#1}{}}{}}
+{\end{examplebox}}
+
+\NewDocumentEnvironment{remark}{o}
+{\begin{remarkbox}{\IfValueTF{#1}{#1}{}}{}}
+{\end{remarkbox}}
+
+
+
+
+
+
+\definecolor{stepblue}{HTML}{2F80ED} % light-ish blue
+\newcommand{\Step}[1]{\par\medskip\noindent\textcolor{stepblue}{ Step #1.}\;}
+
+\definecolor{stepblue}{HTML}{2F80ED} % light-ish blue
+\newcommand{\LabelProof}[1]{\par\medskip\noindent\textcolor{stepblue}{ #1.}\;}
+
+\geometry{margin=1in}
+
+% -------------------------------------------------
+% Theorem environments (numbered by chapter)
+% -------------------------------------------------
+%\newtheorem{theorem}{Theorem}[chapter]
+%\newtheorem{proposition}[theorem]{Proposition}
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{corollary}[theorem]{Corollary}
+
+%\theoremstyle{definition}
+%\newtheorem{definition}[theorem]{Definition}
+%\newtheorem{example}[theorem]{Example}
+
+%\theoremstyle{remark}
+%\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------
+% Notation / macros
+% -------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Pp}{\Prob}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\Ecal}{\mathcal{E}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\Ind}{\mathbf{1}} % indicator symbol (use as \Ind_{A})
+\newcommand{\pos}{^{+}} % Positive part
+
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\F}{\mathcal{F}}
+
+\newcommand{\transpose}{\mathsf{T}}
+\newcommand{\pinv}{^{+}} % pseudo-inverse
+
+
+\newcommand{\esssup}{\operatorname*{ess\,sup}}
+\newcommand{\essinf}{\operatorname*{ess\,inf}}
+
+\title{Seminar - Elliptic Optimal Control with Measures}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We consider elliptic optimal control problems with \emph{localized} actuation, modeled by measure-valued controls \(u\in\mathcal M(\Omega)\).
+The primal problem minimizes a quadratic tracking term in \(L^2(\Omega)\) plus the total variation penalty \(\alpha\|u\|_{\mathcal M(\Omega)}\), subject to the Dirichlet state equation \(Ay=u\) in a very weak sense.
+We recall well-posedness and Sobolev regularity for elliptic equations with measure data and use these properties to prove existence (and, under standard assumptions, uniqueness) of optimal controls.
+A key step is a Fenchel-duality derivation of an equivalent predual formulation in a Hilbert space, where the nonsmooth measure norm becomes the box constraint \(\|p\|_\infty\le \alpha\).
+This leads to KKT conditions and an active-set characterization of sparsity, with the multiplier identified as (minus) the optimal control.
+An explicit one-dimensional gravity example is worked out, yielding a Dirac optimal control and a sharp no-control threshold.
+Finally, we outline regularization and semismooth Newton / primal-dual active set methods for efficient numerical solution.
+\end{abstract}
+
+
+
+\tableofcontents
+
+\section{Introduction}
+
+In many applications, actuation is \emph{localized} rather than distributed.
+Typical examples are point sources/sinks in diffusion processes, localized injection or removal of a species, sparse placement of control devices, or idealized loads in mechanics.
+Mathematically, such controls are naturally modeled by \emph{finite (signed) Borel measures} on the spatial domain:
+a Dirac mass represents a point actuator, finite sums of Diracs represent finitely many devices, and more general measures allow line- or surface-supported actuation.
+A central goal is therefore to formulate, analyze, and compute optimal controls when the control variable lives in a measure space.
+
+A second (and equally important) motivation is \emph{structure promotion}.
+Replacing quadratic control costs by $L^1$-type costs is known to promote sparsity of optimal controls (i.e.\ large inactive regions / controls that vanish on sets of positive measure); see, e.g., \cite{Stadler2009L1,WachsmuthWachsmuth2011} (and, for the classical finite-dimensional analogue, \cite{Tibshirani1996}).
+However, in PDE-constrained settings, an $L^1(\Omega)$ control space may be analytically inadequate:
+boundedness in $L^1$ does not provide weak compactness, and minimizing sequences may fail to have weakly convergent subsequences.
+This points to the space of bounded measures as the natural relaxation and closure of the model. 
+
+\subsection{Framework}
+We focus on elliptic state equations of the form
+\begin{equation}\label{eq:state_intro}
+Ay = u \quad \text{in }\Omega, 
+\qquad y=0 \quad \text{on }\partial\Omega,
+\end{equation}
+where $A$ is a linear, second-order elliptic operator and $u$ is the control.
+If $u$ is a measure, equation \eqref{eq:state_intro} must be interpreted in a weak/distributional sense: one tests against smooth functions and transfers derivatives onto the test function.
+Intuitively, the elliptic operator acts as a \emph{smoothing map}:
+even if $u$ is singular (e.g.\ a Dirac mass), the state $y$ is still a genuine function with Sobolev regularity.
+This smoothing property makes the tracking functional $\frac12\|y-z\|_{L^2(\Omega)}^2$ meaningful.
+
+The optimization problem we have in mind is the prototypical sparse elliptic control problem
+\begin{equation}\label{eq:PM_intro}
+\min_{u \in \mathcal{M}(\Omega)} 
+\ \frac12\|y-z\|_{L^2(\Omega)}^2 + \alpha \|u\|_{\mathcal{M}(\Omega)}
+\qquad \text{s.t. } Ay=u,
+\end{equation}
+where $\mathcal{M}(\Omega)$ denotes the space of bounded (signed) measures and $\|\cdot\|_{\mathcal{M}(\Omega)}$ is the total variation norm.
+The term $\alpha\|u\|_{\mathcal{M}(\Omega)}$ penalizes the \emph{mass} of the control; informally, it encourages placing ``as little control as possible'' and thus produces sparse/low-dimensional structures (few point actuators, small active sets, etc.).
+
+A major computational difficulty is that \eqref{eq:PM_intro} is \emph{nonsmooth} and is posed in a \emph{nonreflexive} Banach space.
+Direct discretization of measures can be delicate.
+A key idea (following the duality-based approach) is to avoid discretizing measures directly:
+one derives an equivalent \emph{predual} problem in a Hilbert space, where the nonsmooth measure norm appears as a \emph{simple box constraint} on a dual variable.
+This transforms \eqref{eq:PM_intro} into a smooth constrained minimization problem that is amenable to efficient Newton-type solvers after suitable regularization.
+
+\subsection{Analytical pillars (what makes the theory work)}
+The report is organized around three pillars:
+
+\paragraph{(I) Elliptic equations with measure right-hand sides.}
+A first step is to clarify in which sense \eqref{eq:state_intro} is solved for $u\in\mathcal{M}(\Omega)$ and which regularity and stability estimates hold.
+The essential message is: \emph{measure data still yield well-defined solutions with Sobolev regularity}, and the solution map $u\mapsto y(u)$ is continuous from $\mathcal{M}(\Omega)$ (with its weak-$\ast$ topology) into suitable Sobolev/Lebesgue spaces.
+This is the analytic backbone that allows us to formulate the tracking term in $L^2(\Omega)$.
+
+\paragraph{(II) Existence (and sometimes uniqueness) of optimal controls in measure spaces.}
+Given (I), one proves existence of minimizers for \eqref{eq:PM_intro} by the direct method of the calculus of variations:
+take a minimizing sequence, extract a weak-$\ast$ convergent subsequence in $\mathcal{M}(\Omega)$, pass to the limit in the state equation and in the objective using lower semicontinuity and compactness.
+Under standard assumptions, strict convexity of the tracking term yields uniqueness of the optimal state (and typically of the optimal control in the measure setting considered).
+
+\paragraph{(III) Duality, predual formulation, and numerical solution.}
+The central computational insight is that Fenchel duality yields a predual problem in a Hilbert space (typically $H^2(\Omega)\cap H^1_0(\Omega)$ for the measure case), with a pointwise constraint of the form $\|p\|_{C_0(\Omega)}\le \alpha$.
+This predual viewpoint replaces the measure variable by a smooth variable subject to box constraints, enabling:
+\begin{itemize}
+  \item derivation of optimality systems with complementarity structure (active/inactive sets);
+  \item Moreau--Yosida (or similar) regularization of the box constraints;
+  \item semismooth Newton / primal-dual active set methods with fast local convergence.
+\end{itemize}
+
+\subsection{Roadmap of the report}
+We proceed as follows.
+In Section~\ref{sec:pde_measures} we review elliptic boundary value problems with measure data, emphasizing the weak/distributional formulation and the resulting regularity estimates.
+In Section~\ref{sec:primal_PM} we establish existence (and discuss uniqueness) for the sparse control problem \eqref{eq:PM_intro}and derives the predual formulation. In section \ref{sec:KKT} we obtain the associated first-order optimality conditions. Next, we give in \ref{sec:example} an example with an explicit solution to make this discussion more tangible. Finally, Section~\ref{sec:numerics} presents the regularization strategy and semismooth Newton-type algorithms used to solve the resulting optimality systems efficiently, together with a short discussion of structural properties of the computed controls (sparsity, active sets, and comparison to quadratic-control formulations).
+
+\section{Elliptic equations with measure right-hand sides}\label{sec:pde_measures}
+
+Measure-valued right-hand sides arise naturally when sources or loads are
+\emph{highly localized}.
+A point actuator at $x_0\in\Omega$ is modeled by a Dirac mass $\delta_{x_0}$, and a
+finite collection of actuators corresponds to a finite sum of Dirac measures.
+More generally, line- or surface-supported actuation leads to measures concentrated
+on lower-dimensional sets.
+In PDE-constrained optimization this is precisely the situation in which it is natural
+to allow the control $u$ to belong to the space $\mathcal{M}(\Omega)$ of bounded
+Borel (Radon) measures. 
+
+\subsection{Distributional and very weak solutions for measure data}\label{sec:dist_vs_veryweak}
+
+When the right-hand side is a measure (e.g.\ a Dirac mass), the elliptic state equation
+\[
+Ay = u \quad\text{in }\Omega,\qquad y=0\quad\text{on }\partial\Omega,
+\qquad u\in\mathcal{M}(\Omega),
+\]
+cannot be interpreted pointwise.
+One therefore needs a weak notion of solution based on testing against smooth functions.
+There are two closely related notions that appear in the literature:
+\emph{distributional} solutions (common in PDE theory) and \emph{very weak} solutions
+(common in PDE-constrained optimization with measure controls).
+They differ mainly by the \emph{choice of test functions} and by how the boundary condition
+is encoded.
+
+\subsection*{Distributional solution}
+We recall the standard PDE notion.
+
+\begin{definition}[Distributional solution]\label{def:distributional}
+Let $\Omega\subset\mathbb{R}^n$ be open, $A$ be a linear differential operator with formal adjoint $A^*$,
+and let $u\in\mathcal{M}(\Omega)$.
+A function $y\in L^1_{\mathrm{loc}}(\Omega)$ is called a \emph{distributional solution} of
+\[
+Ay=u \quad\text{in }\Omega
+\]
+if
+\begin{equation}\label{eq:dist_def}
+\int_\Omega y\,A^*\varphi\,dx \;=\; \int_\Omega \varphi\,du
+\qquad \forall\,\varphi\in C_c^\infty(\Omega).
+\end{equation}
+\end{definition}
+
+\paragraph{Remarks.}
+\begin{itemize}
+\item The test functions are compactly supported in $\Omega$, so \eqref{eq:dist_def} expresses only the
+      \emph{interior PDE} and does \emph{not} encode boundary conditions.
+\item In particular, for a Dirichlet problem one must impose $y|_{\partial\Omega}=0$ \emph{separately},
+      e.g.\ by requiring $y$ to belong to a space with zero trace (when such a trace makes sense),
+      or by selecting the solution via a Green's function / resolvent construction.
+\end{itemize}
+For measure right-hand sides, distributional formulations are standard; see, for example,
+the measure-data elliptic theory in \cite{ponceEMS}.%
+
+\subsection*{Very weak solution (Dirichlet problem)}
+In optimal control with measure-valued controls it is convenient to use a formulation
+that (i) allows a natural pairing with $u\in\mathcal{M}(\Omega)$ and (ii) incorporates the
+Dirichlet boundary condition through the choice of test functions.
+
+\begin{definition}[Very weak solution of the Dirichlet problem]\label{def:veryweak_dirichlet}
+Let $\Omega\subset\mathbb{R}^n$ be bounded and let $u\in\mathcal{M}(\Omega)$.
+A function $y\in L^1(\Omega)$ is called a \emph{very weak solution} of the Dirichlet problem
+\[
+Ay=u \quad\text{in }\Omega,\qquad y=0\quad\text{on }\partial\Omega,
+\]
+if
+\begin{equation}\label{eq:veryweak_def}
+\int_\Omega y\,A^*\phi\,dx \;=\; \int_\Omega \phi\,du
+\qquad \forall\,\phi\in \mathcal{V},
+\end{equation}
+where the test space $\mathcal{V}$ consists of functions that
+\begin{itemize}
+\item satisfy the homogeneous boundary condition (in the trace sense), and
+\item are regular enough so that the right-hand side pairing $\int_\Omega \phi\,du$ is meaningful.
+\end{itemize}
+A typical choice in the measure-control setting is
+\[
+\mathcal{V} := H^2(\Omega)\cap H^1_0(\Omega)
+\quad\text{with}\quad
+H^2(\Omega)\cap H^1_0(\Omega)\hookrightarrow C_0(\Omega)
+\ \ (n\in\{2,3\}),
+\]
+so that $\phi$ is continuous (hence integrable against measures) and vanishes on $\partial\Omega$.
+This is the framework adopted in \cite{clasonkunisch2009}.
+\end{definition}
+
+\paragraph{Remarks.}
+\begin{itemize}
+\item In contrast to Definition~\ref{def:distributional}, test functions in \eqref{eq:veryweak_def}
+      \emph{touch the boundary}, and the condition $\phi|_{\partial\Omega}=0$ is built into $\mathcal{V}$.
+      In this sense, \eqref{eq:veryweak_def} is tailored to Dirichlet boundary conditions.
+\item The name ``very weak'' emphasizes that we require only $y\in L^1(\Omega)$ and test against a
+      space $\mathcal{V}$ designed to make the measure pairing well-defined.
+\end{itemize}
+
+\paragraph{How the two notions (Very weak and distributional solution) are related?}
+The two notions are closely connected by the following proposition
+
+\begin{proposition}[Very weak implies distributional (interior equation)]\label{prop:vw_implies_dist}
+Assume $y\in L^1(\Omega)$ satisfies the very weak identity \eqref{eq:veryweak_def} for a test space
+$\mathcal{V}$ containing $C_c^\infty(\Omega)$ (or approximating it).
+Then $y$ is a distributional solution of $Ay=u$ in the sense of Definition~\ref{def:distributional}.
+\end{proposition}
+
+\begin{proof}[Proof Idea]
+If $\varphi\in C_c^\infty(\Omega)\subset\mathcal{V}$, then \eqref{eq:veryweak_def} holds with $\phi=\varphi$,
+which is exactly \eqref{eq:dist_def}.
+If $C_c^\infty(\Omega)$ is not literally included in $\mathcal{V}$, one uses density/approximation arguments.
+\hfill$\square$    
+\end{proof}
+
+
+\paragraph{Key difference.}
+Distributional solutions encode only the PDE in the interior and require boundary conditions to be
+imposed separately. Very weak solutions are formulated with test functions that already satisfy the
+homogeneous boundary condition; hence the Dirichlet condition is incorporated into the definition.
+
+\paragraph{Why we choose the very weak formulation for measure controls?}
+In PDE-constrained optimization with $u\in\mathcal{M}(\Omega)$, the very weak formulation is preferred
+for three practical reasons.
+
+\paragraph{(1) The measure pairing is immediate and stable.}
+The control space is $\mathcal{M}(\Omega)=C_0(\Omega)^*$, so for any $\phi\in C_0(\Omega)$ the duality pairing
+$\langle u,\phi\rangle=\int_\Omega \phi\,du$ is well-defined and continuous.
+By choosing $\mathcal{V}\hookrightarrow C_0(\Omega)$, the right-hand side in \eqref{eq:veryweak_def}
+becomes the canonical dual pairing used in the optimization framework. \cite{clasonkunisch2009}
+
+\paragraph{(2) The standard $H^1_0$ weak formulation is generally too strong.}
+A common weak formulation for $Ay=u$ would test against $v\in H^1_0(\Omega)$, requiring $u\in H^{-1}(\Omega)$.
+However, for $n\ge 2$ a general measure $u\in\mathcal{M}(\Omega)$ does \emph{not} define a continuous linear
+functional on $H^1_0(\Omega)$, i.e.\ $\mathcal{M}(\Omega)\not\subset H^{-1}(\Omega)$ in general.
+Thus one cannot base the state equation on the standard variational formulation when $u$ is merely a measure.
+The very weak formulation avoids this mismatch by testing against smoother functions that are continuous,
+so that the measure pairing is always meaningful. \cite{ponceEMS}
+
+\paragraph{(3) It aligns with duality/predual arguments and numerics.}
+Clason--Kunisch derive the optimality system by Fenchel duality, leading to a predual variable living in
+$H^2(\Omega)\cap H^1_0(\Omega)$ with pointwise constraints in $C_0(\Omega)$.
+The identity \eqref{eq:veryweak_def} is exactly the PDE constraint written in the duality pairing
+$\mathcal{M}(\Omega)\times C_0(\Omega)$, which is the natural setting for their analysis and for
+regularization-based Newton-type solvers. \cite{clasonkunisch2009}
+
+\paragraph{Conclusion.}
+Distributional solutions are the natural notion to express $Ay=u$ in the interior of $\Omega$.
+For measure-valued controls under Dirichlet boundary conditions, the very weak formulation is the natural
+choice because it (i) incorporates the boundary condition through the test space,
+(ii) makes the measure pairing canonical via $\mathcal{M}(\Omega)=C_0(\Omega)^*$, and
+(iii) matches the duality-based analysis and numerical methods used later.
+
+
+\subsection{Measure space and duality pairing}
+Let $\mathcal{M}(\Omega)$ denote the space of bounded Borel measures on $\Omega$,
+equipped with the total variation norm $\|\mu\|_{\mathcal{M}}=|\mu|(\Omega)$.
+By the Riesz representation theorem, $\mathcal{M}(\Omega)$ can be identified with
+the dual of $C_0(\Omega)$ (continuous functions vanishing at the boundary / with
+compact support, depending on the chosen convention), with the duality pairing
+$\langle \mu,\varphi\rangle = \int_\Omega \varphi\,d\mu$ and the norm characterization
+\[
+\|\mu\|_{\mathcal{M}}=\sup\Bigl\{\int_\Omega \varphi\,d\mu:\ \varphi\in C_0(\Omega),\ \|\varphi\|_\infty\le 1\Bigr\}.
+\]
+
+\subsection{Dirichlet problem with measure datum: existence and Sobolev regularity}
+For PDE-constrained control on bounded domains, we need a Dirichlet boundary
+condition and a solution space with enough regularity to be used in the cost functional.
+A convenient (and widely used) result is the Sobolev embedding of solutions for
+measure data.
+
+\begin{proposition}[Elliptic equation with measure data]\label{prop:elliptic_measure}
+For every $u\in\mathcal{M}(\Omega)$, the equation $Ay=u$ has a unique very weak solution $y$.
+Moreover,
+\[
+y \in W^{1,p}_0(\Omega)
+\quad\text{for all}\quad 1\le p<\frac{n}{n-1},
+\]
+and there exists $C>0$ (independent of $u$) such that
+\begin{equation}\label{eq:W1p_estimate}
+\|y\|_{W^{1,p}(\Omega)} \le C\,\|u\|_{\mathcal{M}(\Omega)}
+\qquad \forall\,1\le p<\frac{n}{n-1}.
+\end{equation}
+\end{proposition}
+
+
+\begin{proof}[Proof sketch]
+A standard strategy is approximation + uniform estimates + compactness:
+\begin{enumerate}
+\item \emph{Approximate the measure by smooth densities.}
+There exists a sequence $(f_k)_k\subset C^\infty(\Omega)$ with $f_k\to\mu$ weakly
+in the sense of measures (and with controlled $L^1$ norms). 
+\item \emph{Solve the Dirichlet problems for smooth data.}
+For each $k$, let $u_k\in W^{1,2}_0(\Omega)$ solve $-\Delta u_k=f_k$.
+(Variational solvability for $L^2$ data is classical.) 
+\item \emph{Uniform $W^{1,q}$-estimate.}
+Using Stampacchia-type estimates and a duality argument (Littman--Stampacchia--Weinberger),
+one obtains $\|u_k\|_{W^{1,q}}\le C\|f_k\|_{L^1}$ uniformly for every $q<n/(n-1)$,
+hence uniformly in terms of $\|\mu\|_{\mathcal{M}}$. 
+\item \emph{Compactness and passage to the limit.}
+By Rellich--Kondrachov, extract a subsequence converging strongly in $L^q(\Omega)$
+(and a.e.) to some $u$. 
+Passing to the limit in the weak formulation yields that $u$ solves $-\Delta u=\mu$
+(in the appropriate weak/distributional sense) with $u\in W^{1,q}_0(\Omega)$ and the stated estimate.
+\end{enumerate}
+Uniqueness follows from linearity plus the standard energy argument (or uniqueness of the variational solution).    
+\end{proof}
+
+
+
+\paragraph{Interpretation.}
+In the elliptic control problem with $u\in\mathcal{M}(\Omega)$, Proposition~\ref{prop:elliptic_measure}
+implies that the state associated with a measure control has Sobolev regularity
+$y\in W^{1,q}_0(\Omega)$ for all $q<n/(n-1)$.
+This is exactly the type of mapping property used in the optimal control analysis:
+from $u^*\in\mathcal{M}(\Omega)$ one deduces $y^*\in W^{1,p}_0(\Omega)$ for $p<n/(n-1)$ gains additional regularity. 
+
+
+\subsection{The solution operator and the mapping to $L^2(\Omega)$}
+Define the linear \emph{control-to-state} operator
+\[
+S:\mathcal{M}(\Omega)\to W^{1,p}_0(\Omega),\qquad Su := y,
+\]
+where $y$ is the unique very weak solution from Proposition~\ref{prop:elliptic_measure}.
+By \eqref{eq:W1p_estimate}, $S$ is bounded.
+
+For the optimization problem with quadratic tracking term in $L^2(\Omega)$ we also need that
+$Su\in L^2(\Omega)$. This follows from Sobolev embedding: choosing
+$p\ge \frac{2n}{n+2}$ (which is possible in $n\in\{2,3\}$ while still having $p<\frac{n}{n-1}$),
+we obtain a continuous embedding $W^{1,p}_0(\Omega)\hookrightarrow L^2(\Omega)$ and hence
+\begin{equation}\label{eq:S_to_L2}
+\|Su\|_{L^2(\Omega)} \le C\,\|u\|_{\mathcal{M}(\Omega)}.
+\end{equation}
+The compactness mechanisms typically used later (e.g.\ for existence of optimal controls)
+are based on boundedness in $W^{1,p}_0(\Omega)$ together with Rellich--Kondrachov,
+which yields strong convergence in $L^2$ along subsequences. \cite{ponceEMS}
+
+\section{Optimal control problems in $\mathcal{M}(\Omega)$}\label{sec:primal_PM}
+
+In many applications the control represents \emph{localized actuation}: point sources, sinks, injections, or devices that act on a small set compared to the domain.
+A natural mathematical model for such effects is a \emph{measure-valued} right-hand side in the elliptic state equation.
+On the optimization side, replacing quadratic control costs by an $\mathcal{M}(\Omega)$-norm (or, heuristically, an $L^1$-type cost) biases the optimizer towards controls that concentrate on small sets, i.e.\ sparse controls; see the structural discussion in \cite{clasonkunisch2009}. 
+
+\subsection{Primal problem}
+Let $\Omega\subset\mathbb{R}^n$ ($n\in\{2,3\}$) be bounded with Lipschitz boundary and let $A$ be a linear second-order elliptic operator with homogeneous Dirichlet boundary condition.
+Fix $z\in L^2(\Omega)$ and $\alpha>0$.
+We consider the \emph{primal measure control problem}
+\begin{equation}\label{eq:PM}
+\tag{$P_M$}
+\min_{u\in\mathcal{M}(\Omega)}\;
+J(u):=\frac12\|y(u)-z\|_{L^2(\Omega)}^2+\alpha\|u\|_{\mathcal{M}(\Omega)}
+\quad\text{s.t.}\quad Ay(u)=u \ \text{in }\Omega,\ \ y(u)=0 \ \text{on }\partial\Omega,
+\end{equation}
+where $y(u)$ denotes the unique very weak solution associated with $u$. In the following we will show that this problem has an unique solution.
+
+\paragraph{Intuition}
+The PDE constraint provides a solution operator
+\[
+S:\mathcal{M}(\Omega)\to W^{1,p}_0(\Omega)\hookrightarrow L^2(\Omega),
+\qquad u\mapsto y(u),
+\]
+where $y(u)$ is understood in the \emph{very weak sense}.
+The key point for existence is the following compactness mechanism:
+a minimizing sequence $(u_n)$ is bounded in $\mathcal{M}(\Omega)$, hence admits a weak-$*$ convergent subsequence;
+the corresponding states $(y_n=S(u_n))$ are bounded in $W^{1,p}_0(\Omega)$ and therefore precompact in $L^2(\Omega)$.
+This gives strong convergence of the tracking term, while the measure norm is weak-$*$ lower semicontinuous.
+
+\begin{proposition}[Existence and uniqueness of a minimizer]\label{prop:exist_PM}
+Problem~\eqref{eq:PM} admits a unique minimizer $(y^*,u^*)\in L^2(\Omega)\times\mathcal{M}(\Omega)$.
+\end{proposition}
+
+\begin{proof}
+\textbf{Step 1: Bounded minimizing sequence and weak-$*$ compactness.}
+Let $(u_n)_{n\in\mathbb{N}}\subset\mathcal{M}(\Omega)$ be a minimizing sequence for $J$.
+Since $(y,u)=(0,0)$ is feasible, we have
+\[
+\inf J \le J(0)=\frac12\|z\|_{L^2(\Omega)}^2,
+\]
+hence $\alpha\|u_n\|_{\mathcal{M}(\Omega)}\le J(u_n)\le C$ for all $n$, so $(u_n)$ is bounded in $\mathcal{M}(\Omega)$.
+By Banach--Alaoglu, there exists a subsequence (not relabeled) and a $u^*\in\mathcal{M}(\Omega)$ such that
+\[
+u_n \xrightharpoonup{*} u^* \quad \text{in } \sigma(\mathcal{M}(\Omega),C_0(\Omega)).
+\]
+
+\textbf{Step 2: Compactness of states.}
+Let $y_n:=y(u_n)$.
+By the elliptic well-posedness in the very weak setting (Section~\ref{sec:veryweak_vs_dist}),
+the sequence $(y_n)$ is bounded in $W^{1,p}_0(\Omega)$ for every $1\le p<\frac{n}{n-1}$.
+Since $W^{1,p}_0(\Omega)\hookrightarrow L^2(\Omega)$ compactly for $n\in\{2,3\}$ and such $p$,
+there exists a further subsequence and $y^*\in L^2(\Omega)$ such that
+\[
+y_n \to y^* \quad \text{strongly in } L^2(\Omega).
+\]
+
+\textbf{Step 3: Passage to the limit in the state equation.}
+Let $\mathcal{V}\subset C_0(\Omega)$ be the test space used in the definition of very weak solution
+(e.g.\ $\mathcal{V}=H^2(\Omega)\cap H^1_0(\Omega)$, cf.\ Remark~\ref{rem:V_into_C0}).
+For every $\varphi\in\mathcal{V}$ the very weak formulation reads
+\[
+\int_\Omega y_n\, A^*\varphi\,dx \;=\; \int_\Omega \varphi\,du_n.
+\]
+The left-hand side converges to $\int_\Omega y^* A^*\varphi\,dx$ by strong $L^2$ convergence of $y_n$
+and the fact that $A^*\varphi\in L^2(\Omega)$.
+The right-hand side converges to $\int_\Omega \varphi\,du^*$ by weak-$*$ convergence in $\mathcal{M}(\Omega)$
+since $\varphi\in C_0(\Omega)$.
+Thus $y^*$ solves $Ay^*=u^*$ in the very weak sense, i.e.\ $y^*=y(u^*)$.
+
+\textbf{Step 4: Lower semicontinuity and optimality.}
+By strong convergence, $\|y_n-z\|_{L^2}^2\to\|y^*-z\|_{L^2}^2$.
+Moreover, the total variation norm is weak-$*$ lower semicontinuous:
+$\|u^*\|_{\mathcal{M}(\Omega)}\le \liminf_{n\to\infty}\|u_n\|_{\mathcal{M}(\Omega)}$.
+Hence
+\[
+J(u^*) \le \liminf_{n\to\infty} J(u_n) = \inf J,
+\]
+so $u^*$ is optimal.
+
+\textbf{Step 5: Uniqueness.}
+The mapping $u\mapsto y(u)$ is linear and injective (for elliptic $A$ with Dirichlet condition),
+and the term $\frac12\|y(u)-z\|_{L^2}^2$ is strictly convex in $y$.
+Together with convexity of $\|u\|_{\mathcal{M}(\Omega)}$, this yields uniqueness of the minimizer.
+\end{proof}
+
+\subsection{Deriving the predual problem from the primal problem}\label{sec:derive_predual}
+
+The primal problem is posed in the non-reflexive space $\mathcal{M}(\Omega)$ and contains
+the nonsmooth term $\|u\|_{\mathcal{M}(\Omega)}$. The insight in \cite{clasonkunisch2009} is to consider the predual of \ref{eq:PM} because its formulation replaces the measure variable
+by a function variable $p\in H^2(\Omega)\cap H^1_0(\Omega)$ subject to the simple constraint
+$\|p\|_\infty\le \alpha$. This section explains how this box constraint is \emph{already hidden}
+in the primal formulation and can be made explicit via convex duality.
+
+\subsection*{Step 1: Write the primal in reduced form}
+Let $S:\mathcal{M}(\Omega)\to L^2(\Omega)$ be the control-to-state map $Su=y(u)$ solving
+$Ay=u$ with homogeneous Dirichlet boundary condition (in the very weak sense).
+Then the primal problem can be written as
+\begin{equation}\label{eq:PM_reduced}
+\min_{u\in\mathcal{M}(\Omega)} \;
+\underbrace{\frac12\|Su-z\|_{L^2(\Omega)}^2}_{=:f(Su)}
+\;+\;
+\underbrace{\alpha\|u\|_{\mathcal{M}(\Omega)}}_{=:g(u)}.
+\end{equation}
+This has the abstract form $\min_{u} f(Lu)+g(u)$ with $L=S$.
+
+\subsection*{Step 2: Dual representation of the quadratic tracking term}
+The functional $f(y)=\frac12\|y-z\|_{L^2}^2$ has the classical convex conjugate representation \cite{ekelandtemam1999}
+\begin{equation}\label{eq:quad_dual_rep}
+f(y)=\sup_{w\in L^2(\Omega)}\Bigl\{\langle y,w\rangle_{L^2}-f^*(w)\Bigr\},
+\qquad
+f^*(w)=\frac12\|w\|_{L^2}^2+\langle z,w\rangle_{L^2}.
+\end{equation}
+Insert \eqref{eq:quad_dual_rep} into \eqref{eq:PM_reduced} to obtain the saddle form
+\begin{equation}\label{eq:saddle_start}
+\inf_{u\in\mathcal{M}(\Omega)}\sup_{w\in L^2(\Omega)}
+\Bigl[
+\langle Su,w\rangle_{L^2}
+-\Bigl(\frac12\|w\|_{L^2}^2+\langle z,w\rangle_{L^2}\Bigr)
++\alpha\|u\|_{\mathcal{M}}
+\Bigr].
+\end{equation}
+
+\subsection*{Step 3: Move $S$ to the adjoint side (appearance of the predual variable)}
+Since $S$ is linear and bounded, $\langle Su,w\rangle_{L^2}$ can be written using the adjoint operator
+$S^*$:
+\[
+\langle Su,w\rangle_{L^2} = \langle u, S^*w\rangle_{\mathcal{M},C_0},
+\]
+where $\langle u,\phi\rangle_{\mathcal{M},C_0}:=\int_\Omega \phi\,du$.
+In elliptic settings, $S^*w$ is the (Dirichlet) adjoint state, i.e.\ the unique solution $p$ of
+\begin{equation}\label{eq:adjoint_p}
+A^*p = w \quad\text{in }\Omega,\qquad p=0\quad\text{on }\partial\Omega,
+\end{equation}
+and for $n\le 3$ one has $p\in H^2(\Omega)\cap H^1_0(\Omega)\hookrightarrow C_0(\Omega)$,
+so the measure pairing $\langle u,p\rangle$ is well-defined.
+Thus, we may identify
+\[
+p := S^*w \in H^2(\Omega)\cap H^1_0(\Omega)
+\qquad\text{and}\qquad
+w = A^*p.
+\]
+In particular, $\|w\|_{L^2}=\|A^*p\|_{L^2}$ and $\langle z,w\rangle=\langle z,A^*p\rangle$.
+
+the saddle formulation \eqref{eq:saddle_start} can be rewritten as
+\begin{equation}\label{eq:inf_sup_step3}
+\inf_{u\in\mathcal{M}(\Omega)}\ \sup_{p\in H^2(\Omega)\cap H^1_0(\Omega)}
+\Bigl[
+\langle u,p\rangle_{\mathcal{M},C_0}
+-\frac12\|A^*p\|_{L^2(\Omega)}^2
+-\langle z,A^*p\rangle_{L^2(\Omega)}
++\alpha\|u\|_{\mathcal{M}(\Omega)}
+\Bigr],
+\end{equation}
+where $\langle u,p\rangle_{\mathcal{M},C_0}:=\int_\Omega p\,du$.
+Equivalently, completing the square in the $p$-dependent quadratic terms yields
+\begin{equation}\label{eq:inf_sup_step3_square}
+\inf_{u\in\mathcal{M}(\Omega)}\ 
+\Bigl[
+-\frac12\|A^*p+z\|_{L^2(\Omega)}^2
++\frac12\|z\|_{L^2(\Omega)}^2
+\Bigr].
+\end{equation}
+
+
+\subsection*{Step 4: Minimize out the measure (conjugate of the measure norm)}
+Next, let $w$ (equivalently $p$) be arbitrary and fixed  in \eqref{eq:saddle_start}. The dependence on $u$ is
+\[
+\inf_{u\in\mathcal{M}(\Omega)}
+\Bigl\{ \langle u,p\rangle_{\mathcal{M},C_0} + \alpha\|u\|_{\mathcal{M}} \Bigr\}.
+\]
+A standard conjugacy fact for norm is \cite{ekelandtemam1999})
+\[
+(\alpha\|\cdot\|_X)^*(p)
+=\sup_{u\in X}\{\langle u,p\rangle_{\mathcal{M},C_0}-\alpha\|u\|_X\}
+= I_{\{\|\phi\|_{X^*}\le \alpha\}}(p).\label{eq:saddle_interm}
+\]
+
+In our setting $X=\mathcal{M}(\Omega)=C_0(\Omega)^*$ thus the convex conjugate of $\alpha\|\cdot\|_{\mathcal{M}}$ is the indicator
+of the $\|\cdot\|_\infty$-ball in $C_0(\Omega)$.
+Equivalently,
+\begin{equation}\label{eq:measure_conjugate_fact}
+\sup_{u\in\mathcal{M}(\Omega)} \bigl\{\langle u,p\rangle_{\mathcal{M},C_0} - \alpha\|u\|_{\mathcal{M}}\bigr\}
+=
+\begin{cases}
+0, & \|p\|_{C_0}\le \alpha,\\
++\infty, & \text{otherwise}.
+\end{cases}
+\end{equation}
+From \eqref{eq:measure_conjugate_fact} one immediately gets
+\begin{equation}
+\inf_{u\in\mathcal{M}(\Omega)} \bigl\{\langle u,p\rangle_{\mathcal{M},C_0} + \alpha\|u\|_{\mathcal{M}}\bigr\}
+=
+\begin{cases}
+0, & \|p\|_{C_0}\le \alpha \ \text{(i.e.\ $\|p\|_\infty\le \alpha$)},\\
+-\infty, & \text{otherwise}.
+\end{cases}\label{eq:inf_step4}
+\end{equation}
+Hence the saddle problem \eqref{eq:saddle_start} is finite only if $\|p\|_\infty\le \alpha$.
+This is the \emph{box constraint} that replaces the measure penalty, we can then rewrite \ref{eq:inf_sup_step3} as
+
+\begin{equation}\label{eq:inf_sup_step4}
+\sup_{p\in\in H^2(\Omega)\cap H^1_0(\Omega)}\
+\Bigl[
+-\frac12\|A^*p\|_{L^2(\Omega)}^2
+-\langle z,A^*p\rangle_{L^2(\Omega)}
+\Bigr], \quad \textrm{subject to} \quad \|p\|_{C_0}\le \alpha, 
+\end{equation}
+since $-\frac12\|A^*p+z\|_{L^2(\Omega)}^2
++\frac12\|z\|_{L^2(\Omega)}^2$ vanishes by \eqref{eq:inf_step4} for any $w$ (and p)
+
+\subsection*{Step 5: The predual problem}
+We can modify \ref{eq:inf_sup_step4} by observing that $\langle z,A^*p\rangle = \langle A^*p,z\rangle$, completing the square and changing the $sup$ by $inf$ by a sign flip to obtain the equivalent 
+\begin{equation}\label{eq:predual_final}
+\inf_{p\in H^2(\Omega)\cap H^1_0(\Omega)}
+\Bigl[\frac12\|A^*p+z\|_{L^2(\Omega)}^2-\frac12\|z\|_{L^2(\Omega)}^2\Bigr]
+\quad\text{subject to}\quad \|p\|_\infty\le \alpha.
+\end{equation}
+This is exactly the predual problem used by Clason--Kunisch.
+
+\begin{remark}
+The derivation shows that the predual constraint $\|p\|_\infty\le\alpha$ is nothing but the dual
+expression of the measure norm penalty:
+\[
+\alpha\|u\|_{\mathcal{M}}
+=\sup_{\|\phi\|_\infty\le\alpha} \langle u,\phi\rangle.
+\]
+Thus, passing from the primal to the predual can be understood as \emph{turning a nonsmooth penalty in the primal variable}
+into a \emph{simple box constraint in an adjoint (dual) variable}.
+\end{remark}
+
+\section{First-order optimality conditions}\label{sec:KKT}
+The next natural step in our optimization problem is to obtain a criteria that will help us decide whether we achieve a solution. First-order optimality conditions come into play as a practical way to obtain it. In the coming discussion we will use the classical KKT procedure adapted to our problem.
+
+Recall the predual problem \ref{eq:predual_final} which we write in slightly different form
+\[
+\tag{$P_M^*$}
+\min_{p\in H^2_0(\Omega)}\;
+F(p)
+\quad\text{s.t.}\quad p\in K:=\{p\in H^2_0(\Omega):\|p\|_{C_0}\le \alpha\},
+\]
+with
+\[
+F(p):=\frac12\|A^*p+z\|_{L^2(\Omega)}^2-\frac12\|z\|_{L^2(\Omega)}^2 .
+\]
+
+\paragraph{Step 1: Compute the derivative of $F$.} 
+For any direction $h\in H^2_0(\Omega)$,
+\[
+F'(p)h
+=\langle A^*p+z,\;A^*h\rangle_{L^2}
+=\langle A(A^*p+z),\;h\rangle_{H^2_0(\Omega)^*,H^2_0(\Omega)}.
+\]
+Hence the gradient (as an element of $H^2_0(\Omega)^*$) is
+\begin{equation}\label{eq:gradF}
+\nabla F(p)=AA^*p+Az \in H^2_0(\Omega)^*.
+\end{equation}
+
+\paragraph{Step 2: Convex KKT condition via subdifferentials.}
+Since $F$ is convex and Fr\'echet differentiable and $K$ is closed and convex, the
+first-order optimality condition for $p^*\in K$ is
+\[
+0\in \partial \bigl(F+I_K\bigr)(p^*)
+=\nabla F(p^*)+\partial I_K(p^*),
+\]
+i.e., there exists a multiplier $\lambda^*\in \partial I_K(p^*)=N_K(p^*)$ (normal cone) such that
+\begin{equation}\label{eq:kkt_inclusion}
+\nabla F(p^*)+\lambda^*=0.
+\end{equation}
+By definition of the normal cone,
+\[
+\lambda^*\in N_K(p^*)
+\quad\Longleftrightarrow\quad
+\langle \lambda^*,\,p-p^*\rangle_{H^2_0{}^*,H^2_0}\le 0
+\quad\forall\,p\in K .
+\]
+
+\paragraph{Step 3: KKT system}
+Combining \eqref{eq:gradF}--\eqref{eq:kkt_inclusion} gives the KKT conditions:
+find $(p^*,\lambda^*)\in H^2_0(\Omega)\times H^2_0(\Omega)^*$ such that
+\begin{equation}\label{eq:KKT_predual}
+\boxed{
+\begin{aligned}
+&AA^*p^*+Az+\lambda^*=0 \qquad\text{in }H^2_0(\Omega)^*,\\
+&\langle \lambda^*,\,p-p^*\rangle_{H^2_0{}^*,H^2_0}\le 0
+\qquad \forall\,p\in H^2_0(\Omega)\ \text{with }\|p\|_{C_0}\le \alpha.
+\end{aligned}}
+\end{equation}
+
+\subsection{Identification of the primal solution}\label{subsec:lambda_equals_minus_u}
+
+We might have characterized the optimality of our predual problem but we are indeed interested in the primal problem, therefore, we need to establish a link between their solutions. We explain how the KKT multiplier for the predual box constraint can be identified with (minus) the optimal measure control. The argument uses only the saddle-point derivation and the convex optimality
+condition for the $u$-subproblem.
+
+\paragraph{Step 1: The $u$-subproblem and its first-order condition.}
+If we decide to fix $p \in C_0(\Omega)$ instead of $w$ in \ref{eq:inf_sup_step3} we encounter the convex minimization problem
+\begin{equation}\label{eq:u_subproblem_again}
+\min_{u\in\mathcal{M}(\Omega)}\;
+h_p(u):=\langle u,p\rangle_{\mathcal{M},C_0}+\alpha\|u\|_{\mathcal{M}(\Omega)}.
+\end{equation}
+Since $h_p$ is proper, convex, and lower semicontinuous, a minimizer $u^*$ satisfies the Fermat rule
+\[
+0\in \partial h_p(u^*).
+\]
+Using $\partial\langle u,p\rangle=\{p\}$ and the sum rule yields
+\begin{equation}\label{eq:E1_sign_correct_again}
+0\in p+\alpha\,\partial\|u^*\|_{\mathcal{M}(\Omega)}
+\qquad\Longleftrightarrow\qquad
+-p\in \alpha\,\partial\|u^*\|_{\mathcal{M}(\Omega)}.
+\end{equation}
+Equivalently,
+\begin{equation}\label{eq:E2_normal_cone_again}
+-u^*\in N_K(p^*).
+\end{equation}
+This is the normal-cone (variational inequality) form of the extremality relation.
+
+\paragraph{Step 3: Identification of the KKT multiplier.}
+Comparing \eqref{eq:KKT_predual_multiplier} with \eqref{eq:E2_normal_cone_again}, we see that the
+normal cone element produced by the $u$-minimization is precisely $-u^*$.
+Therefore one may choose the KKT multiplier in \eqref{eq:kkt_inclusion} as
+\begin{equation}\label{eq:lambda_equals_minus_u}
+\boxed{\ \lambda^*=-u^*\ }.
+\end{equation}
+With this choice, stationarity becomes
+\[
+\nabla F(p^*)-u^*=0,
+\]
+i.e.\ the primal optimal control is given by the gradient of the smooth predual objective at $p^*$.
+
+\begin{remark}[sign convetions]
+The sign in \eqref{eq:E1_sign_correct_again}--\eqref{eq:lambda_equals_minus_u} depends only on whether the saddle
+form contains $+\langle u,p\rangle$ or $-\langle u,p\rangle$.
+For the subproblem \eqref{eq:u_subproblem_again} with $+\langle u,p\rangle$, the correct extremality relation is
+$-p\in \alpha\,\partial\|u^*\|_{\mathcal{M}}$ and hence $\lambda^*=-u^*$.    
+\end{remark}
+
+The derivation of the predual and the optimality conditions can be summarized in the following theorem proved in \cite{clasonkunisch2009} but with a different approach.
+\begin{theorem}[Clason--Kunisch, Theorem 2.4]\label{thm:clason_thm_2_4}
+The dual of $(P_M^\ast)$ is $(P_M)$, and the solutions $u^\ast\in \mathcal{M}(\Omega)$ of $(P_M)$ and
+$p^\ast\in H_0^2(\Omega)$ of $(P_M^\ast)$ are related by
+\begin{equation}\label{eq:clason_2_4}
+\left\{
+\begin{aligned}
+u^\ast &= AA^\ast p^\ast + Az,\\
+0 &\ge \bigl\langle -u^\ast,\; p - p^\ast \bigr\rangle_{H_0^2(\Omega)^\ast,\,H_0^2(\Omega)}
+\qquad \text{for all } p\in H_0^2(\Omega)\ \text{with }\|p\|_{C_0}\le \alpha.
+\end{aligned}
+\right.
+\end{equation}
+\end{theorem}
+
+\subsection{Primal stationarity in subdifferential form}
+For completeness, one may also express optimality on the primal side using the subdifferential of the
+measure norm. In reduced form,
+\[
+\min_{u\in\mathcal{M}(\Omega)}\;
+\frac12\|A^{-1}u-z\|_{L^2}^2+\alpha\|u\|_{\mathcal{M}}.
+\]
+The first-order condition reads
+\[
+0 \in A^{-*}(A^{-1}u^*-z)+\alpha\,\partial\|u^*\|_{\mathcal{M}}.
+\]
+With the adjoint state $p^*:=-A^{-*}(A^{-1}u^*-z)\in C_0(\Omega)$, this becomes
+\[
+p^*\in \alpha\,\partial\|u^*\|_{\mathcal{M}}
+\quad\Longleftrightarrow\quad
+\|p^*\|_{C_0}\le \alpha,\ \ \langle u^*,p^*\rangle=\alpha\|u^*\|_{\mathcal{M}}\label{eq:first_order_primal}
+\]
+These conditions give rise to the interesting property that the measure $u^*$ can only concentrate mass where $\|p\| = \alpha$, i.e., in the active set of the predual problem. This is know as the sparsity property and is not obvious at first glance, but we can see it by using the polar decomposition of measures, which is summarized in the following theorem \cite{Bogachev2007MeasureTheory}.   
+
+\begin{theorem}[Polar decomposition of a finite signed (Radon) measure]\label{thm:polar_decomp_measure}
+Let $\Omega$ be a locally compact Hausdorff space and let $u\in\mathcal M(\Omega)$ be a finite signed Radon
+measure. Denote by $|u|$ its total variation measure. Then there exists a Borel
+measurable function $\sigma:\Omega\to[-1,1]$ such that
+\begin{enumerate}
+\item $|\sigma(x)|=1$ for $|u|$-almost every $x\in\Omega$,
+\item $u$ is absolutely continuous with respect to $|u|$ and
+      \[
+      \frac{du}{d|u|}=\sigma \quad\text{$|u|$-a.e.},
+      \]
+      in particular,
+      \[
+      u = \sigma\,|u| \qquad\text{in the sense that}\qquad
+      \int_\Omega \varphi\,du = \int_\Omega \varphi\,\sigma\,d|u|
+      \quad\forall\,\varphi\in C_c(\Omega).
+      \]
+\end{enumerate}
+Moreover, $\sigma$ is $|u|$-a.e. uniquely determined (any two such functions agree $|u|$-a.e.).
+\end{theorem}
+
+\subsubsection*{From active set concentration to the sparsity/sign property }
+To see what we will call the sparsity property, recall the dual characterization of the total variation norm
+\[
+\|u\|_{\mathcal M}=\sup\Bigl\{\langle u,\varphi\rangle:\ \varphi\in C_0(\Omega),\ \|\varphi\|_\infty\le 1\Bigr\},
+\]
+and that from \eqref{eq:first_order_primal} $p^*\in \alpha\,\partial\|u^*\|_{\mathcal M}$ is equivalent to
+\[
+\Bigl\|\frac{p^*}{\alpha}\Bigr\|_\infty\le 1,
+\qquad
+\bigl\langle u^*,\tfrac{p^*}{\alpha}\bigr\rangle=\|u^*\|_{\mathcal M} \label{eq:optm_cond}.
+\]
+
+\paragraph{Using polar decomposition.}
+If $\varphi\in C_c(\Omega)$ satisfies $\|\varphi\|_\infty\le 1$ then
+\[
+\langle u,\varphi\rangle=\int_\Omega \varphi\,du=\int_\Omega \varphi\,\sigma\,d|u|
+\le \int_\Omega |\varphi|\,d|u|\le \int_\Omega 1\,d|u|=\|u\|_{\mathcal M}.
+\]
+Taking $\varphi = p^*/\alpha$ and using \ref{eq:optm_cond} on the left-hand side we conclude that two inequalities must be in fact equalities. But 
+\[
+\int_\Omega \varphi\,\sigma\,d|u|
+= \int_\Omega |\varphi|\,d|u|
+\]
+only if
+\[
+\varphi\,\sigma = |\varphi|, \quad |u|-a.e. \label{eq:sigma_cond}
+\]
+Also,
+\[
+\int_\Omega |\varphi|\,d|u| = \int_\Omega 1\,d|u| \label{eq:u_cond}
+\]
+only if
+\[
+|\varphi| = 1, \quad |u|-a.e.
+\]
+
+\paragraph{Consequence for $u^*$ and the active set.}
+Apply the preceding statement \ref{eq:u_cond} to $u=u^*$ and $\varphi=p^*/\alpha$ yields
+\[
+|u^*|\bigl(\{x:\ |p^*(x)|<\alpha\}\bigr)=0.
+\]
+Equivalently, $u^*$ is \emph{identically zero as a measure} on the inactive set
+$\{ |p^*|<\alpha\}$.
+In addition, from \ref{eq:sigma_cond} we obtain that $\sigma^*\in\{-1, +1\}$, thus
+\[
+u^* \ge 0 \ \text{on } \{p^*=\alpha\},
+\qquad
+u^* \le 0 \ \text{on } \{p^*=-\alpha\},
+\qquad |u^*|\textrm{-a.e.}
+\]
+in the sense of measures. In summary
+
+\begin{theorem}[Sparsity property.]
+Let $p\in C_c(\Omega)$ with $\psi\ge 0$. Then:
+\begin{align*}
+&\langle u^*,p\rangle=0
+\quad\text{if }\operatorname{supp}p\subset\{x:\ |p^*(x)|<\alpha\},
+\\
+&\langle u^*,p\rangle\ge 0
+\quad\text{if }\operatorname{supp}p\subset\{x:\ p^*(x)=\alpha\},
+\\
+&\langle u^*,p\rangle\le 0
+\quad\text{if }\operatorname{supp}p\subset\{x:\ p^*(x)=-\alpha\}.
+\end{align*}    
+\end{theorem}
+
+The first line follows from $|u^*|(\{|p^*|<\alpha\})=0$.
+The latter two follow from the measure-inequalities $u^*\ge 0$ on $\{p^*=\alpha\}$
+and $u^*\le 0$ on $\{p^*=-\alpha\}$.
+
+\section{Example: A tensioned string under gravity}
+\label{sec:example}
+
+This section presents a fully explicit one--dimensional example of an optimal
+control problem with measure--valued controls governed by an elliptic equation.
+The example is motivated by a simple mechanical model: a string
+subject to gravity, which we attempt to straighten using a sparse actuation.
+All calculations are carried out in closed form and no heuristic arguments are
+used, although we will invoke arguments based on physics to simplify the problem.
+
+%-------------------------------------------------
+
+\subsection{Physical model and mathematical setting}
+
+Let $\Omega=(0,1)$.
+We consider a one--dimensional tensioned string with homogeneous Dirichlet boundary conditions,
+\[
+y_{\mathrm{phys}}(0)=y_{\mathrm{phys}}(1)=0,
+\]
+subject to gravity and an additional actuator force $u$, i.e., this models a clamped beam under gravity and our control is an additional support to the beam. Note that in this case, we assume that the beam is so thin that we can ignore bending moments. Also we will consider that the string tension has unit value, therefore, the equilibrium equation is
+\begin{equation}
+- y_{\mathrm{phys}}'' = 1 + u
+\quad \text{in } \mathcal D'(0,1),
+\label{eq:physical-beam}
+\end{equation}
+where the control $u$ is allowed to be a bounded Radon measure,
+\[
+u \in \mathcal M(0,1).
+\]
+
+The constant right--hand side $1$ models a uniform gravitational load.
+The use of measure--valued controls allows for both distributed and concentrated
+(point) actuators.
+
+%-------------------------------------------------
+
+\subsection*{Gravity reference state and problem reformulation}
+
+Let $y_g$ denote the displacement due to gravity alone, i.e.
+\[
+- y_g'' = 1, \qquad y_g(0)=y_g(1)=0.
+\]
+This problem has the explicit solution
+\begin{equation}
+y_g(x) = \frac{x(1-x)}{2}.
+\label{eq:gravity-sag}
+\end{equation}
+
+We introduce the shifted variable
+\[
+y := y_{\mathrm{phys}} - y_g.
+\]
+Then $y$ satisfies
+\begin{equation}
+- y'' = u, \qquad y(0)=y(1)=0.
+\label{eq:shifted-state}
+\end{equation}
+
+If the physical objective is to keep the beam as straight as possible, i.e.
+$y_{\mathrm{phys}}\approx 0$, then the shifted state $y$ should track
+\[
+z(x) := - y_g(x) = -\frac{x(1-x)}{2}.
+\]
+
+%-------------------------------------------------
+
+\subsection*{Primal optimal control problem}
+
+After our modification, the problem fits exactly into the abstract framework studied until here.
+The primal optimization problem reads:
+\begin{equation}
+\boxed{
+\begin{aligned}
+\min_{u \in \mathcal M(0,1)} \quad &
+\frac12 \| y - z \|_{L^2(0,1)}^2
++ \alpha \|u\|_{\mathcal M(0,1)} ,\\
+\text{s.t.} \quad &
+- y'' = u \quad \text{in } \mathcal D'(0,1),\\
+& y(0)=y(1)=0,
+\end{aligned}
+}
+\label{eq:primal-problem}
+\end{equation}
+where:
+\begin{itemize}
+\item $y$ is the state (vertical displacement of the string),
+\item $u$ is the control (actuator force),
+\item $z=-y_g$ is the desired state (i.e. a straight string),
+\item $\alpha>0$ is a regularization parameter.
+\end{itemize}
+
+The term $\|u\|_{\mathcal M}$ penalizes the total magnitude of applied forces and
+is the source of sparsity in the optimal control.
+
+%-------------------------------------------------
+
+\subsection*{Predual formulation and KKT system}
+
+Let $A=-\partial_{xx}$ with domain $H_0^2(0,1)$, so $A^* = A = -\partial_{xx}$.
+Following the theory developed earlier, the predual problem leads to the
+following KKT system 
+\begin{align}
+p^{(4)} - 1 + \lambda^* &= 0
+\quad \text{in } H^{-2}(0,1),
+\label{eq:kkt-reduced} \\
+\langle \lambda^*,\, p - p^* \rangle &\le 0
+\quad \forall p\in H_0^2(0,1)
+\text{ with } \|p\|_{C_0([0,1])}\le \alpha.
+\label{eq:kkt-reduced-2}
+\end{align}
+and the optimal control is $u^* = -\lambda^*$.
+
+%-------------------------------------------------
+
+\subsection{Construction of the dual solution}
+To solve the system given by $\ref{eq:kkt-reduced}$ and $\ref{eq:kkt-reduced-2}$ is not trivial, because is unclear how we could combine the two expressions to obtain $p^*$ and $\lambda^*$. An option to overcome this problem is to establish (to guess) active sets, because we can take advantage of corollary (), which says $\lambda^*$ vanishes on inactive sets. In our particular problem this is actually not far-fetched, for instance, we might want a symmetric load in our string, which imposes a support (control) at the middle-length of the string. Let us take this route to proceed with our example, hence, we seek a symmetric solution such that the constraint
+\[
+|p^*(x)| \le \alpha
+\]
+is active only at the midpoint $x=\tfrac12$.
+Thus
+\[
+p^*\!\left(\tfrac12\right)=\alpha,
+\qquad
+|p^*(x)|<\alpha \ \text{for } x\neq \tfrac12.
+\]
+
+On the inactive set the multiplier vanishes, and
+\eqref{eq:kkt-reduced} reduces to
+\[
+p^{(4)} = 1.
+\]
+
+Solving it on $(0,\tfrac12)$, we obtain
+\[
+p^*(x) = \frac{x^4}{24} + a x^3 + c x,
+\]
+which satisfies $p^*(0)=0$ and $p^{*\prime\prime}(0)=0$ (since $p \in H_0^2)$.
+By symmetry we set $p^*(x)=p^*(1-x)$ on $(\tfrac12,1)$.
+
+Imposing the active region set and enforcing symmetry condition in the first derivative at the midpoint
+\[
+p^{*\prime}\!\left(\tfrac12\right)=0,
+\qquad
+p^*\!\left(\tfrac12\right)=\alpha,
+\]
+yields the coefficients
+\[
+a = -4\alpha-\frac{1}{32},
+\qquad
+c = 3\alpha+\frac{1}{384}.
+\]
+Thus
+\[
+p^*(x)
+=
+\begin{cases}
+\displaystyle
+\frac{x^4}{24}
+-\left(4\alpha+\frac{1}{32}\right)x^3
++\left(3\alpha+\frac{1}{384}\right)x,
+& 0 \le x \le \tfrac12, \\[1.2em]
+\displaystyle
+\frac{(1-x)^4}{24}
+-\left(4\alpha+\frac{1}{32}\right)(1-x)^3
++\left(3\alpha+\frac{1}{384}\right)(1-x),
+& \tfrac12 \le x \le 1.
+\end{cases}
+\]
+
+
+%-------------------------------------------------
+
+\subsection*{Distributional fourth derivative and jump term}
+Now that we have $p^*$ we are in position to obtain $\lambda^*$ by solving for it in $\ref{eq:kkt-reduced}$. We just need to be careful because we must interpret it in the distributional sense.
+The function $p^*$ is piecewise $C^4$,
+with $p^*,p^{*\prime},p^{*\prime\prime}$ continuous at $x=\tfrac12$,
+but $p^{*\prime\prime\prime}$ has a jump there. We can use the following lemma.
+
+\begin{lemma}[Distributional derivative with jump]
+\label{lem:jump}
+Let $q\in C^{k-1}(a,b)$ be such that $q^{(k-1)}$ is piecewise $C^1$ and has a jump
+at $x_0\in(a,b)$.
+Then, in the sense of distributions,
+\[
+D^k q
+=
+(q^{(k)})_{\mathrm{reg}}
++
+\big[q^{(k-1)}\big]_{x_0}\,\delta_{x_0},
+\]
+where
+\[
+\big[q^{(k-1)}\big]_{x_0}
+=
+\lim_{x\to x_0^+} q^{(k-1)}(x)
+-
+\lim_{x\to x_0^-} q^{(k-1)}(x).
+\]
+\end{lemma}
+
+This result follows by repeated integration by parts and can be found, for example, in \cite[Section~4.2]{Evans2010PDE}.
+
+Using in $p^{*(4)}$ yields
+\[
+p^{*(4)} = 1 + J\,\delta_{1/2},
+\qquad
+J = 48\alpha - \frac{5}{8}.
+\]
+Substituting into \eqref{eq:kkt-reduced} gives
+\[
+(1+J\delta_{1/2}) - 1 + \lambda^* = 0,
+\]
+hence
+\[
+\lambda^* = - J\,\delta_{1/2}.
+\]
+
+The optimal control is therefore
+\begin{equation}
+\boxed{
+u^* = \left(48\alpha - \frac{5}{8}\right)\delta_{1/2}.
+}
+\end{equation}
+
+The control is a single Dirac measure supported exactly at the point where the
+dual constraint is active.
+
+%-------------------------------------------------
+
+\subsection*{Physical displacement}
+
+The physical displacement is recovered from
+\[
+y_{\mathrm{phys}}^* = -p^{*\prime\prime}.
+\]
+On $(0,\tfrac12)$ one obtains
+\[
+y_{\mathrm{phys}}^*(x)
+=
+-\frac{x^2}{2}
++\left(24\alpha+\frac{3}{16}\right)x,
+\]
+and by symmetry on $(\tfrac12,1)$.
+Thus the beam is piecewise quadratic with a slope kink at the midpoint, induced
+by the point actuator.
+
+\subsection{Verification of the KKT stationarity equation}
+\label{subsec:distributional-verification}
+
+We verify that the explicitly constructed pair $(p^*,\lambda^*)$ satisfies the
+KKT stationarity equation
+\begin{equation}
+p^{*(4)} - 1 + \lambda^* = 0
+\quad \text{in } \mathcal D'(0,1).
+\label{eq:kkt-distributional}
+\end{equation}
+
+\subsubsection*{Distributional formulation}
+
+Recall that the distributional fourth derivative of a function
+$p\in L^1_{\mathrm{loc}}(0,1)$ is defined by
+\[
+\langle D^4 p, \varphi \rangle
+:=
+\langle p, \varphi^{(4)} \rangle
+=
+\int_0^1 p(x)\,\varphi^{(4)}(x)\,dx,
+\qquad
+\forall \varphi\in C_c^\infty(0,1).
+\]
+Thus, equation \eqref{eq:kkt-distributional} is equivalent to
+\begin{equation}
+\int_0^1 p^*(x)\,\varphi^{(4)}(x)\,dx
+-
+\int_0^1 \varphi(x)\,dx
++
+\langle \lambda^*, \varphi \rangle
+= 0
+\quad
+\forall \varphi\in C_c^\infty(0,1).
+\label{eq:kkt-test}
+\end{equation}
+
+\subsubsection*{Structure of the dual solution}
+
+The function $p^*$ is piecewise $C^4$ on $(0,1)$, with a possible loss of
+regularity only at the midpoint $x_0:=\tfrac12$.
+More precisely:
+\begin{itemize}
+\item $p^*\in C^2([0,1])$,
+\item $p^{*\prime\prime\prime}$ has a jump discontinuity at $x_0$,
+\item $p^{*(4)}(x)=1$ for all $x\in(0,1)\setminus\{x_0\}$.
+\end{itemize}
+
+The jump of the third derivative is given by
+\[
+J := \big[p^{*\prime\prime\prime}\big]_{x_0}
+=
+p^{*\prime\prime\prime}(x_0^+) - p^{*\prime\prime\prime}(x_0^-)
+=
+48\alpha - \frac{5}{8}.
+\]
+
+The multiplier is defined as
+\[
+\lambda^* := -J\,\delta_{x_0}.
+\]
+
+\subsubsection*{Computation of the distributional fourth derivative}
+
+Let $\varphi\in C_c^\infty(0,1)$ be arbitrary.
+We compute
+\[
+\langle D^4 p^*, \varphi \rangle
+=
+\int_0^1 p^*(x)\,\varphi^{(4)}(x)\,dx
+=
+\int_0^{x_0} p^*(x)\,\varphi^{(4)}(x)\,dx
++
+\int_{x_0}^{1} p^*(x)\,\varphi^{(4)}(x)\,dx.
+\]
+
+We integrate by parts four times on each subinterval.
+Since $\varphi$ has compact support in $(0,1)$, all boundary terms at $x=0$ and
+$x=1$ vanish.
+The only remaining boundary contributions arise at the interface $x=x_0$.
+
+On $(0,x_0)$ one obtains
+\begin{align*}
+\int_0^{x_0} p^*\,\varphi^{(4)}
+&=
+\int_0^{x_0} p^{*(4)}\,\varphi
++
+\Big[
+p^*\varphi^{(3)}
+- p^{*\prime}\varphi^{(2)}
++ p^{*\prime\prime}\varphi'
+- p^{*\prime\prime\prime}\varphi
+\Big]_{x_0^-}.
+\end{align*}
+
+On $(x_0,1)$ one similarly finds
+\begin{align*}
+\int_{x_0}^{1} p^*\,\varphi^{(4)}
+&=
+\int_{x_0}^{1} p^{*(4)}\,\varphi
+-
+\Big[
+p^*\varphi^{(3)}
+- p^{*\prime}\varphi^{(2)}
++ p^{*\prime\prime}\varphi'
+- p^{*\prime\prime\prime}\varphi
+\Big]_{x_0^+}.
+\end{align*}
+
+Adding both contributions yields
+\begin{align}
+\langle D^4 p^*, \varphi \rangle
+&=
+\int_0^1 p^{*(4)}(x)\,\varphi(x)\,dx
++
+\Big(
+\mathcal B\big|_{x_0^-}
+-
+\mathcal B\big|_{x_0^+}
+\Big),
+\label{eq:distributional-sum}
+\end{align}
+where
+\[
+\mathcal B :=
+p^*\varphi^{(3)}
+- p^{*\prime}\varphi^{(2)}
++ p^{*\prime\prime}\varphi'
+- p^{*\prime\prime\prime}\varphi.
+\]
+
+Since $p^*$, $p^{*\prime}$, and $p^{*\prime\prime}$ are continuous at $x_0$,
+all corresponding terms cancel in the difference
+$\mathcal B|_{x_0^-}-\mathcal B|_{x_0^+}$.
+Only the term involving $p^{*\prime\prime\prime}$ remains:
+\[
+\mathcal B|_{x_0^-}-\mathcal B|_{x_0^+}
+=
+\big(p^{*\prime\prime\prime}(x_0^+) - p^{*\prime\prime\prime}(x_0^-)\big)\,
+\varphi(x_0)
+=
+J\,\varphi(x_0).
+\]
+
+Using $p^{*(4)}(x)=1$ away from $x_0$, equation \eqref{eq:distributional-sum}
+becomes
+\[
+\langle D^4 p^*, \varphi \rangle
+=
+\int_0^1 \varphi(x)\,dx
++
+J\,\varphi(x_0).
+\]
+
+Recognizing the second term as the action of a Dirac distribution, we conclude
+that
+\begin{equation}
+D^4 p^* = 1 + J\,\delta_{x_0}
+\quad \text{in } \mathcal D'(0,1).
+\label{eq:p4-distribution}
+\end{equation}
+
+\subsubsection*{Verification of the KKT equation}
+
+Substituting \eqref{eq:p4-distribution} and $\lambda^*=-J\delta_{x_0}$ into
+\eqref{eq:kkt-test} yields
+\[
+\langle D^4 p^*, \varphi \rangle
+-
+\int_0^1 \varphi(x)\,dx
++
+\langle \lambda^*, \varphi \rangle
+=
+\bigg(\int_0^1 \varphi\,dx + J\varphi(x_0)\bigg)
+-
+\int_0^1 \varphi\,dx
+-
+J\varphi(x_0)
+=0.
+\]
+
+Since $\varphi\in C_c^\infty(0,1)$ was arbitrary, this proves that
+\[
+p^{*(4)} - 1 + \lambda^* = 0
+\quad \text{in } \mathcal D'(0,1),
+\]
+and thus the KKT stationarity condition is satisfied in the distributional
+sense.
+
+\subsection{Threshold for vanishing optimal control}
+
+In this section we identify the precise condition under which it is \emph{not}
+optimal to apply any control in the gravity example studied in the previous
+section. This phenomenon is a direct consequence of the KKT system and translates the idea that to insert a control comes with a cost -- which is not always worth to pay.
+
+\subsection*{Unconstrained KKT equation}
+
+Recall that the predual KKT system reads
+\begin{align}
+AA^* p^* + A z + \lambda^* &= 0, \label{eq:kkt-threshold-1}\\
+\lambda^* &\in N_K(p^*),
+\qquad K := \{p\in C_0([0,1]) : \|p\|_\infty \le \alpha\}, \label{eq:kkt-threshold-2}
+\end{align}
+and that the optimal control is recovered via
+\[
+u^* = -\lambda^*.
+\]
+
+A necessary and sufficient condition for the \emph{vanishing control}
+$u^*\equiv 0$ is $\lambda^*\equiv 0$.
+In this case, the stationarity equation \eqref{eq:kkt-threshold-1} reduces to the
+\emph{unconstrained adjoint equation}
+\begin{equation}
+AA^* p_0 + A z = 0.
+\label{eq:unconstrained-adjoint}
+\end{equation}
+
+Moreover, since $0\in N_K(p_0)$ if and only if $p_0\in K$, the second KKT condition
+\eqref{eq:kkt-threshold-2} yields
+\begin{equation}
+u^*\equiv 0
+\quad \Longleftrightarrow \quad
+\|p_0\|_{C_0([0,1])} \le \alpha.
+\label{eq:threshold-condition}
+\end{equation}
+
+Thus, the supremum norm of the unconstrained solution $p_0$ provides the exact
+threshold for the appearance of nonzero control.
+
+\subsection*{Explicit computation for the gravity example}
+
+In the one--dimensional gravity example,
+\[
+A = -\partial_{xx},
+\qquad
+z(x) = -\frac{x(1-x)}{2},
+\]
+we have $z''(x)=1$ and hence $A z = -1$.
+The unconstrained adjoint equation \eqref{eq:unconstrained-adjoint} becomes
+\begin{equation}
+p_0^{(4)} - 1 = 0
+\quad \text{in } (0,1),
+\label{eq:unconstrained-ode}
+\end{equation}
+with boundary conditions
+\[
+p_0(0)=p_0(1)=0,
+\qquad
+p_0''(0)=p_0''(1)=0,
+\]
+corresponding to $p_0\in H_0^2(0,1)$.
+
+Solving \eqref{eq:unconstrained-ode} explicitly yields
+\[
+p_0(x)
+=
+\frac{1}{24}\bigl(x^4 - 2x^3 + x\bigr).
+\]
+
+A direct calculation shows that $p_0$ attains its maximum at $x=\tfrac12$, with
+\[
+\|p_0\|_{C_0([0,1])}
+=
+p_0\!\left(\tfrac12\right)
+=
+\frac{5}{384}.
+\]
+
+Combining \eqref{eq:threshold-condition} with the explicit value above, we obtain
+the following sharp criterion.
+
+\begin{proposition}[No--control threshold for the gravity example]
+\label{prop:no-control-threshold}
+For the gravity example considered in this chapter, the optimal control is
+identically zero if and only if
+\[
+\alpha \ge \frac{5}{384}.
+\]
+If $\alpha < \frac{5}{384}$, then the box constraint in the predual problem
+becomes active and the optimal control is nonzero.
+\end{proposition}
+
+\paragraph{Interpretation.}
+The function $p_0$ can be interpreted as a \emph{sensitivity field} measuring the
+marginal benefit of applying a unit force at each point.
+The parameter $\alpha$ represents the cost per unit force.
+Condition \eqref{eq:threshold-condition} therefore states that control is applied
+only if, at some point, the benefit of actuation exceeds its cost.
+
+In particular, for $\alpha \ge 5/384$, the gravitational deformation is tolerated
+without actuation, while for smaller values of $\alpha$ the optimal strategy
+introduces sparse point actuators.
+
+\section{Numerics}
+\label{seq:numerics}
+
+TBD
+
+
+
+
+
+
+\bibliographystyle{plain} % numeric
+\bibliography{refs}
+
+\end{document}
