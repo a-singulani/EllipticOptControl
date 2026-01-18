@@ -9,6 +9,9 @@
 \usepackage{enumitem}
 \usepackage{geometry}
 \usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{float}
 
 
 % -------------------------------------------------
@@ -166,6 +169,7 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\A}{\mathcal{A}}
 \newcommand{\B}{\mathcal{B}}
+\newcommand{\I}{\mathcal{I}}
 \newcommand{\Ecal}{\mathcal{E}}
 \newcommand{\supp}{\operatorname{supp}}
 \newcommand{\Ind}{\mathbf{1}} % indicator symbol (use as \Ind_{A})
@@ -355,7 +359,7 @@ H^2(\Omega)\cap H^1_0(\Omega)\hookrightarrow C_0(\Omega)
 \ \ (n\in\{2,3\}),
 \]
 so that $\phi$ is continuous (hence integrable against measures) and vanishes on $\partial\Omega$.
-This is the framework adopted in \cite{clasonkunisch2009}.
+This is the framework adopted in \cite{ClasonKunisch2009}.
 \end{definition}
 
 \paragraph{Remarks.}
@@ -397,7 +401,7 @@ for three practical reasons.
 The control space is $\mathcal{M}(\Omega)=C_0(\Omega)^*$, so for any $\phi\in C_0(\Omega)$ the duality pairing
 $\langle u,\phi\rangle=\int_\Omega \phi\,du$ is well-defined and continuous.
 By choosing $\mathcal{V}\hookrightarrow C_0(\Omega)$, the right-hand side in \eqref{eq:veryweak_def}
-becomes the canonical dual pairing used in the optimization framework. \cite{clasonkunisch2009}
+becomes the canonical dual pairing used in the optimization framework. \cite{ClasonKunisch2009}
 
 \paragraph{(2) The standard $H^1_0$ weak formulation is generally too strong.}
 A common weak formulation for $Ay=u$ would test against $v\in H^1_0(\Omega)$, requiring $u\in H^{-1}(\Omega)$.
@@ -412,7 +416,7 @@ Clason--Kunisch derive the optimality system by Fenchel duality, leading to a pr
 $H^2(\Omega)\cap H^1_0(\Omega)$ with pointwise constraints in $C_0(\Omega)$.
 The identity \eqref{eq:veryweak_def} is exactly the PDE constraint written in the duality pairing
 $\mathcal{M}(\Omega)\times C_0(\Omega)$, which is the natural setting for their analysis and for
-regularization-based Newton-type solvers. \cite{clasonkunisch2009}
+regularization-based Newton-type solvers. \cite{ClasonKunisch2009}
 
 \paragraph{Conclusion.}
 Distributional solutions are the natural notion to express $Ay=u$ in the interior of $\Omega$.
@@ -509,7 +513,7 @@ which yields strong convergence in $L^2$ along subsequences. \cite{ponceEMS}
 
 In many applications the control represents \emph{localized actuation}: point sources, sinks, injections, or devices that act on a small set compared to the domain.
 A natural mathematical model for such effects is a \emph{measure-valued} right-hand side in the elliptic state equation.
-On the optimization side, replacing quadratic control costs by an $\mathcal{M}(\Omega)$-norm (or, heuristically, an $L^1$-type cost) biases the optimizer towards controls that concentrate on small sets, i.e.\ sparse controls; see the structural discussion in \cite{clasonkunisch2009}. 
+On the optimization side, replacing quadratic control costs by an $\mathcal{M}(\Omega)$-norm (or, heuristically, an $L^1$-type cost) biases the optimizer towards controls that concentrate on small sets, i.e.\ sparse controls; see the structural discussion in \cite{ClasonKunisch2009}. 
 
 \subsection{Primal problem}
 Let $\Omega\subset\mathbb{R}^n$ ($n\in\{2,3\}$) be bounded with Lipschitz boundary and let $A$ be a linear second-order elliptic operator with homogeneous Dirichlet boundary condition.
@@ -594,7 +598,7 @@ Together with convexity of $\|u\|_{\mathcal{M}(\Omega)}$, this yields uniqueness
 \subsection{Deriving the predual problem from the primal problem}\label{sec:derive_predual}
 
 The primal problem is posed in the non-reflexive space $\mathcal{M}(\Omega)$ and contains
-the nonsmooth term $\|u\|_{\mathcal{M}(\Omega)}$. The insight in \cite{clasonkunisch2009} is to consider the predual of \ref{eq:PM} because its formulation replaces the measure variable
+the nonsmooth term $\|u\|_{\mathcal{M}(\Omega)}$. The insight in \cite{ClasonKunisch2009} is to consider the predual of \ref{eq:PM} because its formulation replaces the measure variable
 by a function variable $p\in H^2(\Omega)\cap H^1_0(\Omega)$ subject to the simple constraint
 $\|p\|_\infty\le \alpha$. This section explains how this box constraint is \emph{already hidden}
 in the primal formulation and can be made explicit via convex duality.
@@ -741,6 +745,7 @@ The next natural step in our optimization problem is to obtain a criteria that w
 
 Recall the predual problem \ref{eq:predual_final} which we write in slightly different form
 \[
+\label{eq:PM_star}
 \tag{$P_M^*$}
 \min_{p\in H^2_0(\Omega)}\;
 F(p)
@@ -841,7 +846,7 @@ For the subproblem \eqref{eq:u_subproblem_again} with $+\langle u,p\rangle$, the
 $-p\in \alpha\,\partial\|u^*\|_{\mathcal{M}}$ and hence $\lambda^*=-u^*$.    
 \end{remark}
 
-The derivation of the predual and the optimality conditions can be summarized in the following theorem proved in \cite{clasonkunisch2009} but with a different approach.
+The derivation of the predual and the optimality conditions can be summarized in the following theorem proved in \cite{ClasonKunisch2009} but with a different approach.
 \begin{theorem}[Clason--Kunisch, Theorem 2.4]\label{thm:clason_thm_2_4}
 The dual of $(P_M^\ast)$ is $(P_M)$, and the solutions $u^\ast\in \mathcal{M}(\Omega)$ of $(P_M)$ and
 $p^\ast\in H_0^2(\Omega)$ of $(P_M^\ast)$ are related by
@@ -1505,11 +1510,712 @@ In particular, for $\alpha \ge 5/384$, the gravitational deformation is tolerate
 without actuation, while for smaller values of $\alpha$ the optimal strategy
 introduces sparse point actuators.
 
+\section{Conceptual comparison: predual reformulation vs.\ variational discretization (SparseFEM as sequel)}
+\label{sec:comparison_sparsefem}
+
+\subsection{A remark on alternative numerical routes}
+In the previous sections of this report, our guiding principle was to \emph{avoid} a direct discretization of
+controls in $\mathcal M(\Omega)$ by passing to a \emph{predual} formulation. In that approach, the predual
+variable $p$ lives in a Hilbert space and the non-smooth measure norm reappears as a \emph{box constraint}
+on $p$; the resulting optimality system can then be treated efficiently by a semismooth Newton method
+based on active sets. This is precisely the philosophy advocated in the duality-based paper
+of Clason--Kunisch. 
+
+It is, however, not the only viable approach. A conceptually different (and, at first glance, more
+``direct'') route is developed in the FEM sequel \emph{Approximation of elliptic control problems in
+measure spaces with sparse solutions} (Casas--Clason--Kunisch). :contentReference[oaicite:1]{index=1}
+The key message of that paper is that one can discretize only the \emph{state equation} by nodal finite
+elements while keeping $u\in\mathcal M(\Omega)$ at the continuous level (``variational discretization''),
+and nevertheless obtain an \emph{intrinsically sparse} discrete control:
+the discrete optimizer can be chosen (uniquely) as a \emph{finite linear combination of Dirac measures at
+mesh nodes}. 
+
+The goal of this section is to (i) explain the main idea of this FEM approach, (ii) state its central theorem,
+and (iii) compare it with the predual strategy used in this report.
+
+%------------------------------------------------------------
+\subsection{Main idea of the FEM sequel: discretize the state, and sparsity becomes nodal}
+We recall the distributed measure-control model problem considered in the FEM sequel:
+\[
+(P)\qquad \min_{u\in\mathcal M(\Omega)}\;
+J(u)=\frac12\|y-y_d\|_{L^2(\Omega)}^2 + \alpha \|u\|_{\mathcal M(\Omega)},
+\quad\text{where }y\text{ solves }-\Delta y + c_0 y = u\text{ in }\Omega,\ y=0\text{ on }\Gamma .
+\]
+:contentReference[oaicite:3]{index=3}
+
+The approximation framework fixes a family of triangulations $\{\mathcal T_h\}_{h>0}$ and the nodal
+$P_1$ finite element space
+\[
+Y_h := \{y_h\in C_0(\Omega): y_h|_{T}\in \mathbb P_1\ \forall T\in\mathcal T_h\}.
+\]
+The discrete state associated with a \emph{measure} $u\in\mathcal M(\Omega)$ is then defined as the unique
+$y_h(u)\in Y_h$ satisfying
+\begin{equation}\label{eq:sparsefem_state_discrete}
+a(y_h,z_h)=\int_{\Omega_h} z_h\,du\qquad\forall z_h\in Y_h,
+\end{equation}
+where $a(\cdot,\cdot)$ is the bilinear form of $-\Delta + c_0$. :contentReference[oaicite:4]{index=4}
+This yields the discrete optimization problem
+\[
+(P_h)\qquad \min_{u\in\mathcal M(\Omega)}\;
+J_h(u)=\frac12\|y_h(u)-y_d\|_{L^2(\Omega_h)}^2 + \alpha \|u\|_{\mathcal M(\Omega)}.
+\]
+:contentReference[oaicite:5]{index=5}
+
+\medskip
+\noindent
+\textbf{The conceptual surprise.}
+At this point the control space has \emph{not} been discretized. Nonetheless, the FEM sequel proves that
+the discrete state equation \eqref{eq:sparsefem_state_discrete} only ``sees'' $u$ through its action on the
+nodal basis. This induces a canonical operator that replaces an arbitrary measure by a Dirac combination
+at mesh nodes \emph{without changing the discrete state}. This is the mechanism that turns sparsity into
+a concrete, finite-dimensional structure.
+
+%------------------------------------------------------------
+\subsection{The central theorem: a canonical Dirac projection $\Lambda_h$}
+Let $\{x_j\}_{j=1}^{N(h)}$ denote the interior nodes of $\mathcal T_h$ and $\{e_j\}_{j=1}^{N(h)}$ the nodal basis
+of $Y_h$. Define the \emph{nodal Dirac space}
+\[
+D_h := \left\{u_h\in\mathcal M(\Omega): u_h=\sum_{j=1}^{N(h)}\lambda_j\,\delta_{x_j}\right\},
+\]
+and the operators $\Pi_h:C_0(\Omega)\to Y_h$ and $\Lambda_h:\mathcal M(\Omega)\to D_h$ by
+\[
+\Pi_h z := \sum_{j=1}^{N(h)} z(x_j)\,e_j,
+\qquad
+\Lambda_h u := \sum_{j=1}^{N(h)} \langle u,e_j\rangle\,\delta_{x_j}.
+\]
+:contentReference[oaicite:6]{index=6}
+
+\begin{theorem}[Canonical nodal Dirac replacement (Casas--Clason--Kunisch)]
+\label{thm:Lambda_h}
+The following properties hold:
+\begin{enumerate}
+\item For every $u\in\mathcal M(\Omega)$, $z\in C_0(\Omega)$ and $z_h\in Y_h$,
+\begin{align}
+\label{eq:Lambda_pairing_FE}
+\langle u,z_h\rangle &= \langle \Lambda_h u, z_h\rangle,\\
+\label{eq:Lambda_pairing_interp}
+\langle u,\Pi_h z\rangle &= \langle \Lambda_h u, z\rangle .
+\end{align}
+\item The mapping is norm-decreasing and consistent:
+\begin{equation}\label{eq:Lambda_norm_and_convergence}
+\|\Lambda_h u\|_{\mathcal M(\Omega)}\le \|u\|_{\mathcal M(\Omega)},\qquad
+\Lambda_h u \stackrel{*}{\rightharpoonup} u\ \text{ in }\mathcal M(\Omega),\qquad
+\|\Lambda_h u\|_{\mathcal M(\Omega)}\to \|u\|_{\mathcal M(\Omega)}.
+\end{equation}
+\item There exists $C>0$ such that for $1<p<\frac{n}{n-1}$,
+\[
+\|u-\Lambda_h u\|_{W^{-1,p}(\Omega)} \le C\,h^{\,1-n/p'}\|u\|_{\mathcal M(\Omega)},
+\]
+(with an analogous bound in $(W^{1,\infty}_0(\Omega))^*$).
+\item Let $y_h$ and $\tilde y_h$ be the solutions of the discrete state equation
+\eqref{eq:sparsefem_state_discrete} corresponding to $u$ and $\Lambda_h u$, respectively.
+Then
+\[
+y_h=\tilde y_h .
+\]
+\end{enumerate}
+\end{theorem}
+
+
+\medskip
+\noindent
+\textbf{Interpretation.}
+Item~4 is the pivotal point: \emph{once the PDE is discretized in $Y_h$, replacing $u$ by the nodal Dirac
+combination $\Lambda_h u$ leaves the discrete state unchanged.} Hence, for the discrete problem,
+``Dirac-at-nodes'' controls are not a heuristic—they are the \emph{canonical representatives} of equivalence
+classes of measures that produce the same discrete state.
+
+A direct consequence is that although $(P_h)$ may have multiple minimizers in $\mathcal M(\Omega)$, there is
+a unique minimizer in $D_h$, and every minimizer collapses to it under $\Lambda_h$:
+\begin{theorem}[Uniqueness in $D_h$]
+\label{thm:unique_in_Dh}
+Problem $(P_h)$ admits at least one solution. Among them there exists a unique one $\bar u_h\in D_h$.
+Moreover, any other solution $\tilde u_h\in\mathcal M(\Omega)$ satisfies $\Lambda_h\tilde u_h=\bar u_h$.
+\end{theorem}
+
+
+Thus, the discrete control can be written uniquely as
+\[
+\bar u_h=\sum_{j=1}^{N(h)}\bar\lambda_j\,\delta_{x_j},
+\]
+and computation reduces to the finite vector $(\bar\lambda_1,\dots,\bar\lambda_{N(h)})$. :contentReference[oaicite:9]{index=9}
+
+%------------------------------------------------------------
+\subsection{Optimality structure and sparsity: adjoint saturation and discrete complementarity}
+The FEM sequel also derives the continuous optimality structure in the measure setting.
+There exists a unique adjoint $\bar\phi\in H^2(\Omega)\cap H^1_0(\Omega)$ solving
+\[
+-\Delta \bar\phi + c_0 \bar\phi = \bar y - y_d\quad\text{in }\Omega,\qquad \bar\phi=0\quad\text{on }\Gamma,
+\]
+such that
+\begin{equation}\label{eq:sparsefem_opt_23_24}
+\alpha\|\bar u\|_{\mathcal M(\Omega)}+\int_\Omega \bar\phi\,d\bar u=0,
+\qquad
+\|\bar\phi\|_{C_0(\Omega)}
+\begin{cases}
+=\alpha,& \bar u\neq 0,\\
+\le \alpha,& \bar u=0.
+\end{cases}
+\end{equation}
+:contentReference[oaicite:10]{index=10}
+In terms of the Jordan decomposition $\bar u=\bar u^+-\bar u^-$, one deduces the saturation/support rule
+\begin{equation}\label{eq:sparsefem_support}
+\supp(\bar u^+)\subset\{x:\bar\phi(x)=-\alpha\},
+\qquad
+\supp(\bar u^-)\subset\{x:\bar\phi(x)=+\alpha\},
+\end{equation}
+hence $\bar u\equiv 0$ on $\{|\bar\phi|<\alpha\}$. 
+
+At the discrete level, the same geometry becomes a \emph{componentwise} complementarity condition. Introducing
+the discrete adjoint $\bar\phi_h\in Y_h$ and the nodal Dirac control $\bar u_h\in D_h$,
+the variational inequality defining the normal cone to the $C_0$-ball can be rewritten as
+\begin{equation}\label{eq:sparsefem_complementarity}
+\bar u_h + \max\!\bigl(0,\,-\bar u_h+\bar\phi_h-\alpha\bigr)
++ \min\!\bigl(0,\,-\bar u_h+\bar\phi_h+\alpha\bigr)=0,
+\end{equation}
+understood componentwise in the coefficient vectors $(\lambda_j)$ and $(\phi_j)$. 
+This is again amenable to a locally superlinearly convergent semismooth Newton method in finite dimension. :contentReference[oaicite:13]{index=13}
+
+%------------------------------------------------------------
+\subsection{Comparison with the predual strategy used in this report}
+We now juxtapose the above FEM philosophy with the predual philosophy we currently follow.
+
+\paragraph{(i) Where nonsmoothness is handled.}
+\begin{itemize}
+\item \textbf{Predual route (this report).} Nonsmoothness is shifted into a \emph{box constraint} on the Hilbert-space
+variable $p$, and the optimality system is solved as a semismooth equation
+\[
+F(p)=AA^*p+\max(0,c(p-\alpha))+\min(0,c(p+\alpha))+Az=0,
+\]
+based on the semismooth projector $P_\alpha(p)=\max(0,p-\alpha)+\min(0,p+\alpha)$ and its Newton derivative
+$\partial_N P_\alpha(p)h=h\,\chi_{\{|p|>\alpha\}}$. 
+\item \textbf{FEM route (SparseFEM).} Nonsmoothness stays in the measure norm, but discretization of the \emph{state}
+induces the canonical Dirac representative $\Lambda_h u$ and yields the componentwise complementarity equation
+\eqref{eq:sparsefem_complementarity} for the nodal coefficients. 
+\end{itemize}
+
+\paragraph{(ii) What ``sparsity'' means computationally.}
+\begin{itemize}
+\item \textbf{Predual.} Sparsity is encoded by the \emph{active set} $\{|p|=\alpha\}$ (or $\{|p|>\alpha\}$ at the
+regularized level), which enters directly in the Newton derivative via the characteristic function
+$\chi_{\{|p|>\alpha\}}$. :contentReference[oaicite:16]{index=16}
+\item \textbf{SparseFEM.} Sparsity is encoded by the smallness of the \emph{saturation set} $\{|\bar\phi|=\alpha\}$ in the
+continuous optimality system \eqref{eq:sparsefem_opt_23_24}--\eqref{eq:sparsefem_support}, and, after discretization,
+by the fact that the discrete optimizer \emph{is literally a finite sum of Diracs at nodes}. 
+\end{itemize}
+
+\paragraph{(iii) Dictionary between variables.}
+In SparseFEM one has the subgradient characterization $-\bar\phi\in \alpha\,\partial\|\cdot\|_{\mathcal M}(\bar u)$,
+equivalently $\alpha\lambda=-\bar\phi$ for a subgradient $\lambda\in C_0(\Omega)$. 
+In the predual approach, the Hilbert-space variable $p$ is constrained by $|p|\le\alpha$ and the active set
+determines the structure of the optimal control. 
+Up to the sign convention, it is therefore natural to identify
+\[
+p \ \approx\ -\bar\phi,
+\qquad
+\{|p|=\alpha\}\ \approx\ \{|\bar\phi|=\alpha\},
+\]
+so that ``box activity'' in the predual formulation corresponds to ``adjoint saturation'' determining the
+support of the measure control in the primal formulation.
+
+\paragraph{(iv) What the FEM sequel adds conceptually.}
+The predual route motivates \emph{why} one should solve for $p$ in a Hilbert space rather than discretizing measures directly. :contentReference[oaicite:20]{index=20}
+The FEM sequel complements this by showing that a straightforward nodal FEM approximation \emph{automatically}
+yields a canonical sparse surrogate of a measure control (Theorem~\ref{thm:Lambda_h}), thereby justifying the
+common practice of representing discrete measures by nodal Dirac sums—\emph{without losing the structural properties
+imposed by the measure norm}. 
+
+
 \section{Numerics}
 \label{seq:numerics}
 
-TBD
+In the predual formulation for measure controls \eqref{eq:PM_star}
+the constraint is a pointwise \emph{box constraint} on the dual variable $p$, i.e.\ $-\alpha\le p(x)\le \alpha$ for all $x\in\Omega$
+(using $H^2_0(\Omega)\hookrightarrow C_0(\Omega)$).
+The associated KKT system \eqref{eq:KKT_predual} has a Lagrange multiplier $\lambda^\ast$ that lives naturally in the dual space $H^2_0(\Omega)^\ast$ and, in general, is \emph{not} an $L^2$-function.
+This is problematic numerically:
+\begin{itemize}
+\item Discretizations and Newton-type methods typically require multipliers that can be represented in the same discrete space as the state/adjoint,
+      e.g.\ piecewise polynomials or grid functions (hence in an $L^2$-like space).
+\item The box constraint is nonsmooth; one needs a structure that yields a (semi)smooth nonlinear equation amenable to fast Newton solvers.
+\end{itemize}
 
+To overcome both issues, we replace the hard constraint by a \emph{Moreau--Yosida regularization} of the indicator of the box constraint set.
+This produces a smooth penalization of constraint violations and yields multipliers that belong to $W^{1,\infty}(\Omega)\subset L^2(\Omega)$.
+We then solve the resulting regularized optimality system by a semismooth Newton method.
+
+\subsection{Moreau--Yosida regularization of the box constraint}
+
+For $c>0$, consider the regularized predual problem
+\[
+\tag{$P_{M,c}^\ast$}
+\label{eq:PM_star_r}
+\min_{p\in H^2_0(\Omega)}\;
+\frac12\|A^\ast p + z\|_{L^2(\Omega)}^2-\frac12\|z\|_{L^2(\Omega)}^2
++\frac{1}{2c}\|\max(0,c(p-\alpha))\|_{L^2(\Omega)}^2
++\frac{1}{2c}\|\min(0,c(p+\alpha))\|_{L^2(\Omega)}^2,
+\]
+where $\max$ and $\min$ are understood pointwise a.e.\ in $\Omega$.
+This functional is strictly convex, hence admits a unique minimizer $p_c\in H^2_0(\Omega)$.
+Its first-order optimality conditions are (in strong form)
+\begin{equation}\label{eq:MY_opt_system}
+\begin{cases}
+AA^\ast p_c + Az + \lambda_c = 0,\\
+\lambda_c = \max(0,c(p_c-\alpha))+\min(0,c(p_c+\alpha)),
+\end{cases}
+\end{equation}
+and satisfy $\lambda_c\in W^{1,\infty}(\Omega)$ in particular $\lambda_c\in L^2(\Omega)$; see \cite{ClasonKunisch2009}.
+
+\subsection*{Convergence to the original (predual) solution}
+
+We now state and prove the key convergence result showing that \ref{eq:PM_star_r} approximates \eqref{eq:PM_star} as $c\to\infty$.
+
+\begin{theorem}[Convergence of the Moreau--Yosida regularization]\label{thm:MY_convergence}
+Let $(p_c,\lambda_c)\in H^2_0(\Omega)\times H^2_0(\Omega)^\ast$ solve \eqref{eq:MY_opt_system} for $c>0$.
+Let $(p^\ast,\lambda^\ast)\in H^2_0(\Omega)\times H^2_0(\Omega)^\ast$ be the unique solution of the KKT system of the unregularized problem, i.e.
+\[
+AA^\ast p^\ast + Az + \lambda^\ast = 0,
+\qquad
+\langle \lambda^\ast, p-p^\ast\rangle_{H^2_0(\Omega)^\ast,H^2_0(\Omega)}\le 0
+\ \ \forall p\in H^2_0(\Omega):\ \|p\|_{C_0(\Omega)}\le\alpha.
+\]
+Then, as $c\to\infty$,
+\[
+p_c \to p^\ast \quad\text{strongly in } H^2_0(\Omega),
+\qquad
+\lambda_c \rightharpoonup \lambda^\ast \quad\text{weakly in } H^2_0(\Omega)^\ast.
+\]
+\end{theorem}
+
+\begin{proof}
+
+\medskip\noindent
+\textbf{Step 1: A key inequality.}
+From the pointwise definition of $\lambda_c$ in \eqref{eq:MY_opt_system},
+one checks (pointwise) that
+\[
+\lambda_c(x)\,p_c(x)=
+\begin{cases}
+c(p_c(x)-\alpha)p_c(x), & p_c(x)\ge \alpha,\\
+0, & |p_c(x)|<\alpha,\\
+c(p_c(x)+\alpha)p_c(x), & p_c(x)\le -\alpha,
+\end{cases}
+\]
+and hence
+\begin{equation}\label{eq:key_lambda_pc}
+\langle \lambda_c,p_c\rangle_{L^2(\Omega)} \ge \frac1c\|\lambda_c\|_{L^2(\Omega)}^2.
+\end{equation}
+(Indeed, on $\{p_c\ge\alpha\}$ we have $\lambda_c=c(p_c-\alpha)\ge 0$ and $\lambda_c p_c = \lambda_c(\lambda_c/c+\alpha)\ge \lambda_c^2/c$, and similarly on $\{p_c\le -\alpha\}$.)
+
+\medskip\noindent
+\textbf{Step 2: Uniform bounds in $H^2_0(\Omega)\times H^2_0(\Omega)^\ast$.}
+Test the variational form of the first equation in \eqref{eq:MY_opt_system} with $v=p_c$:
+\[
+\|A^\ast p_c\|_{L^2(\Omega)}^2 + \langle z, A^\ast p_c\rangle_{L^2(\Omega)}
++ \langle \lambda_c, p_c\rangle_{H^2_0(\Omega)^\ast,H^2_0(\Omega)} = 0.
+\]
+Using \eqref{eq:key_lambda_pc} and Cauchy--Schwarz for $\langle z, A^\ast p_c\rangle$ yields
+\[
+\|A^\ast p_c\|_{L^2(\Omega)}^2 + \frac1c\|\lambda_c\|_{L^2(\Omega)}^2
+\le \|A^\ast p_c\|_{L^2(\Omega)}\|z\|_{L^2(\Omega)},
+\]
+hence $\|A^\ast p_c\|_{L^2(\Omega)}\le \|z\|_{L^2(\Omega)}$ for all $c$.
+Using the first equation again,
+\[
+\|\lambda_c\|_{H^2_0(\Omega)^\ast}
+= \sup_{\substack{v\in H^2_0(\Omega)\\ \|v\|_{H^2_0}\le 1}}
+\langle \lambda_c, v\rangle
+\le 
+\sup_{\|v\|_{H^2_0}\le 1} \bigl(\langle A^\ast p_c, A^\ast v\rangle + \langle z, A^\ast v\rangle \bigr)
+\le K,
+\]
+for some constant $K$ independent of $c$ (here we use the norm equivalence assumption for $A^\ast$ on $H^2_0(\Omega)$ as in the paper).
+Thus $(p_c,\lambda_c)$ is uniformly bounded in $H^2_0(\Omega)\times H^2_0(\Omega)^\ast$.
+
+\medskip\noindent
+\textbf{Step 3: Weak limits and the limiting first equation.}
+By Banach--Alaoglu, there exists a subsequence (not relabeled) and a pair $(\tilde p,\tilde\lambda)$ such that
+\[
+(p_c,\lambda_c)\rightharpoonup (\tilde p,\tilde\lambda)
+\quad\text{in }H^2_0(\Omega)\times H^2_0(\Omega)^\ast.
+\]
+Passing to the limit in the weak form of the first equation in \eqref{eq:MY_opt_system} gives
+\begin{equation}\label{eq:limit_first_eq}
+AA^\ast \tilde p + Az + \tilde\lambda = 0
+\quad\text{in }H^2_0(\Omega)^\ast.
+\end{equation}
+
+\medskip\noindent
+\textbf{Step 4: Feasibility of the limit $\tilde p$.}
+From the pointwise expression for $\lambda_c$ we compute
+\[
+\frac1c\|\lambda_c\|_{L^2(\Omega)}^2
+= c\|\max(0,p_c-\alpha)\|_{L^2(\Omega)}^2
++ c\|\min(0,p_c+\alpha)\|_{L^2(\Omega)}^2.
+\]
+The estimate in Step 2 yields $\frac1c\|\lambda_c\|_{L^2}^2\le \|z\|_{L^2}^2$, hence
+\[
+\|\max(0,p_c-\alpha)\|_{L^2}^2 \le \frac{1}{c}\|z\|_{L^2}^2 \to 0,
+\qquad
+\|\min(0,p_c+\alpha)\|_{L^2}^2 \le \frac{1}{c}\|z\|_{L^2}^2 \to 0.
+\]
+Since $H^2_0(\Omega)\hookrightarrow L^2(\Omega)$ compactly, we have (after subsequence extraction) $p_c\to\tilde p$ strongly in $L^2(\Omega)$, so the above implies
+\[
+-\alpha \le \tilde p(x)\le \alpha \quad\text{for a.e.\ }x\in\Omega,
+\]
+i.e.\ $\|\tilde p\|_{C_0(\Omega)}\le \alpha$ (recall $\tilde p\in H^2_0(\Omega)\hookrightarrow C_0(\Omega)$).
+
+\medskip\noindent
+\textbf{Step 5: Strong convergence $p_c\to\tilde p$ in $H^2_0(\Omega)$.}
+By optimality of $p_c$ for $(P_{M,c}^\ast)$ and since the regularization terms are nonnegative,
+\[
+\frac12\|A^\ast p_c+z\|_{L^2}^2
+\le
+\frac12\|A^\ast p+z\|_{L^2}^2
+\quad \forall p\in H^2_0(\Omega)\text{ with }\|p\|_{C_0}\le\alpha.
+\]
+Taking $\limsup_{c\to\infty}$ and using weak lower semicontinuity yields
+\[
+\limsup_{c\to\infty}\frac12\|A^\ast p_c+z\|_{L^2}^2
+\le
+\frac12\|A^\ast \tilde p+z\|_{L^2}^2
+\le
+\liminf_{c\to\infty}\frac12\|A^\ast p_c+z\|_{L^2}^2,
+\]
+so $\|A^\ast p_c\|_{L^2}\to\|A^\ast \tilde p\|_{L^2}$.
+Together with the weak convergence $p_c\rightharpoonup \tilde p$ in $H^2_0$ and the norm equivalence induced by $A^\ast$ (assumption (A) in the paper), this implies $p_c\to\tilde p$ strongly in $H^2_0(\Omega)$.
+
+\medskip\noindent
+\textbf{Step 6: Passing to the limiting variational inequality.}
+For every feasible $p$ (i.e.\ $\|p\|_{C_0}\le\alpha$), the monotonicity of the max/min terms gives
+\[
+\langle \lambda_c, p-p_c\rangle_{H^2_0(\Omega)^\ast,H^2_0(\Omega)} \le 0.
+\]
+Using $\lambda_c\rightharpoonup \tilde\lambda$ in $H^2_0(\Omega)^\ast$ and $p_c\to\tilde p$ in $H^2_0(\Omega)$, we obtain
+\[
+\langle \tilde\lambda, p-\tilde p\rangle_{H^2_0(\Omega)^\ast,H^2_0(\Omega)} \le 0
+\quad \forall p\in H^2_0(\Omega):\ \|p\|_{C_0}\le\alpha.
+\]
+Together with \eqref{eq:limit_first_eq}, this shows that $(\tilde p,\tilde\lambda)$ satisfies the unregularized KKT system.
+By uniqueness of the solution of the KKT system (as in the paper), we conclude $\tilde p=p^\ast$ and $\tilde\lambda=\lambda^\ast$.
+
+\medskip\noindent
+\textbf{Step 7: Conclusion for the full family.}
+Since every weakly convergent subsequence has the same limit, the whole family satisfies
+$p_c\to p^\ast$ in $H^2_0(\Omega)$ and $\lambda_c\rightharpoonup \lambda^\ast$ in $H^2_0(\Omega)^\ast$ as $c\to\infty$.
+\end{proof}
+
+Theorem~\ref{thm:MY_convergence} provides the rigorous justification for the numerical strategy:
+\begin{enumerate}
+\item Replace the original box constraint by a Moreau--Yosida penalty $(P_{M,c}^\ast)$.
+      This yields a smooth objective and an $L^2$-representable multiplier
+      \[
+      \lambda_c = \max(0,c(p_c-\alpha))+\min(0,c(p_c+\alpha)),
+      \]
+      which is directly computable on a grid/finite element space.
+\item Solve the regularized optimality system \eqref{eq:MY_opt_system} by a semismooth Newton method:
+      the nonsmooth projection-type operator becomes \emph{semismooth}, with a Newton derivative involving the active set
+      $\{x:\ |p_c(x)|>\alpha\}$ (cf.\ \cite{ClasonKunisch2009}).
+\item Increase $c$ (or choose $c$ sufficiently large) to approximate the original solution:
+      Theorem~\ref{thm:MY_convergence} guarantees that $p_c$ converges to the true predual solution $p^\ast$ in $H^2_0(\Omega)$.
+      Consequently, the control reconstructed from the predual variable (via $u^\ast = AA^\ast p^\ast + Az$ in the measure case)
+      is approximated by the computable expression $u_c = AA^\ast p_c + Az$.
+\end{enumerate}
+
+In conclusion, this regularization scheme is not only an algorithmic trick to make Newton work; it is a \emph{consistent approximation} of the original constrained problem, and Theorem~\ref{thm:MY_convergence} is the bridge between the computed $(p_c,\lambda_c)$ and the true KKT pair $(p^\ast,\lambda^\ast)$.
+
+\subsection{Semismooth Newton method for the regularized predual problem (measure case)}
+\label{sec:ssn}
+
+\paragraph{Starting point: the regularized optimality system.}
+Fix a Moreau--Yosida parameter $c>0$ and recall the regularized optimality system (cf.\ \cite[Sec.~3.2]{ClasonKunisch2011})
+\begin{equation}\label{eq:opt_sys_reg}
+AA^\ast p_c + \lambda_c + Az = 0,
+\qquad
+\lambda_c = \max\!\bigl(0,c(p_c-\alpha)\bigr)+\min\!\bigl(0,c(p_c+\alpha)\bigr),
+\end{equation}
+where $\max$ and $\min$ are taken pointwise a.e.\ in $\Omega$.
+The goal is to solve \eqref{eq:opt_sys_reg} efficiently for $p_c\in H_0^2(\Omega)$.
+
+\paragraph{Intuitive idea (why ``active sets'' appear).}
+The mapping
+\[
+p \longmapsto \max\!\bigl(0,c(p-\alpha)\bigr)+\min\!\bigl(0,c(p+\alpha)\bigr)
+\]
+is \emph{piecewise affine} in $p$:
+\[
+\max(0,c(p-\alpha))=
+\begin{cases}
+c(p-\alpha), & p>\alpha,\\
+0, & p\le \alpha,
+\end{cases}
+\qquad
+\min(0,c(p+\alpha))=
+\begin{cases}
+0, & p\ge -\alpha,\\
+c(p+\alpha), & p<- \alpha.
+\end{cases}
+\]
+Hence, if we already knew where $p$ violates the bounds $\pm\alpha$, the term is simply linear there and zero elsewhere.
+This motivates the following strategy:
+\begin{quote}
+\emph{Guess the regions where $p$ is active (i.e.\ outside $[-\alpha,\alpha]$), then solve the linear equation corresponding to that guess, then update the guess.}
+\end{quote}
+Semismooth Newton makes this precise and yields a fast method with superlinear convergence.
+
+%------------------------------------------------------------
+\subsubsection{Reformulation as a semismooth equation}
+
+Define the nonlinear operator $F:H_0^2(\Omega)\to H_0^2(\Omega)^\ast$ by
+\begin{equation}\label{eq:F_def_paper}
+F(p):= AA^\ast p \;+\; \max\!\bigl(0,c(p-\alpha)\bigr)\;+\;\min\!\bigl(0,c(p+\alpha)\bigr)\;+\;Az.
+\end{equation}
+Then \eqref{eq:opt_sys_reg} is equivalent to the root-finding problem
+\begin{equation}\label{eq:F_root}
+F(p)=0 \quad \text{in } H_0^2(\Omega)^\ast.
+\end{equation}
+
+Introduce the projection-type operator
+\begin{equation}\label{eq:Palpha}
+P_\alpha(p):=\max(0,p-\alpha)+\min(0,p+\alpha),
+\end{equation}
+so that $F(p)=AA^\ast p + c\,P_\alpha(p)+Az$.
+
+\paragraph{Semismoothness and Newton derivative (as in the paper).}
+It is known (see \cite[Ex.~8.14]{ItoKunisch2008}) that $P_\alpha$ is semismooth from $L^q(\Omega)$ to $L^p(\Omega)$ if $q>p$,
+and that a Newton derivative is given by
+\begin{equation}\label{eq:Newton_derivative_Palpha}
+\partial_N P_\alpha(p)h = h\,\chi_{\{|p|>\alpha\}}
+=
+\begin{cases}
+h(x), & |p(x)|>\alpha,\\
+0, & |p(x)|\le \alpha.
+\end{cases}
+\end{equation}
+Since $AA^\ast$ is linear and Fr\'echet differentiable, it follows that $F$ is semismooth and
+\begin{equation}\label{eq:Newton_derivative_F}
+\partial_N F(p)h \;=\; AA^\ast h \;+\; c\,h\,\chi_{\{|p|>\alpha\}}.
+\end{equation}
+
+%------------------------------------------------------------
+\subsection{Semismooth Newton method for the regularized predual problem (measure case)}
+\label{sec:ssn}
+
+\paragraph{Starting point: the regularized optimality system.}
+Fix a Moreau--Yosida parameter $c>0$ and recall the regularized optimality system (cf.\ \cite[Sec.~3.2]{ClasonKunisch2011})
+\begin{equation}\label{eq:opt_sys_reg}
+AA^\ast p_c + \lambda_c + Az = 0,
+\qquad
+\lambda_c = \max\!\bigl(0,c(p_c-\alpha)\bigr)+\min\!\bigl(0,c(p_c+\alpha)\bigr),
+\end{equation}
+where $\max$ and $\min$ are taken pointwise a.e.\ in $\Omega$.
+The goal is to solve \eqref{eq:opt_sys_reg} efficiently for $p_c\in H_0^2(\Omega)$.
+
+\paragraph{Intuitive idea (why ``active sets'' appear).}
+The mapping
+\[
+p \longmapsto \max\!\bigl(0,c(p-\alpha)\bigr)+\min\!\bigl(0,c(p+\alpha)\bigr)
+\]
+is \emph{piecewise affine} in $p$:
+\[
+\max(0,c(p-\alpha))=
+\begin{cases}
+c(p-\alpha), & p>\alpha,\\
+0, & p\le \alpha,
+\end{cases}
+\qquad
+\min(0,c(p+\alpha))=
+\begin{cases}
+0, & p\ge -\alpha,\\
+c(p+\alpha), & p<- \alpha.
+\end{cases}
+\]
+Hence, if we already knew where $p$ violates the bounds $\pm\alpha$, the term is simply linear there and zero elsewhere.
+This motivates the following strategy:
+\begin{quote}
+\emph{Guess the regions where $p$ is active (i.e.\ outside $[-\alpha,\alpha]$), then solve the linear equation corresponding to that guess, then update the guess.}
+\end{quote}
+Semismooth Newton makes this precise and yields a fast method with superlinear convergence.
+
+%------------------------------------------------------------
+\subsubsection{Reformulation as a semismooth equation}
+
+Define the nonlinear operator $F:H_0^2(\Omega)\to H_0^2(\Omega)^\ast$ by
+\begin{equation}\label{eq:F_def_paper}
+F(p):= AA^\ast p \;+\; \max\!\bigl(0,c(p-\alpha)\bigr)\;+\;\min\!\bigl(0,c(p+\alpha)\bigr)\;+\;Az.
+\end{equation}
+Then \eqref{eq:opt_sys_reg} is equivalent to the root-finding problem
+\begin{equation}\label{eq:F_root}
+F(p)=0 \quad \text{in } H_0^2(\Omega)^\ast.
+\end{equation}
+
+Introduce the projection-type operator
+\begin{equation}\label{eq:Palpha}
+P_\alpha(p):=\max(0,p-\alpha)+\min(0,p+\alpha),
+\end{equation}
+so that $F(p)=AA^\ast p + c\,P_\alpha(p)+Az$.
+
+\paragraph{Semismoothness and Newton derivative (as in the paper).}
+It is known (see \cite[Ex.~8.14]{ItoKunisch2008}) that $P_\alpha$ is semismooth from $L^q(\Omega)$ to $L^p(\Omega)$ if $q>p$,
+and that a Newton derivative is given by
+\begin{equation}\label{eq:Newton_derivative_Palpha}
+\partial_N P_\alpha(p)h = h\,\chi_{\{|p|>\alpha\}}
+=
+\begin{cases}
+h(x), & |p(x)|>\alpha,\\
+0, & |p(x)|\le \alpha.
+\end{cases}
+\end{equation}
+Since $AA^\ast$ is linear and Fr\'echet differentiable, it follows that $F$ is semismooth and
+\begin{equation}\label{eq:Newton_derivative_F}
+\partial_N F(p)h \;=\; AA^\ast h \;+\; c\,h\,\chi_{\{|p|>\alpha\}}.
+\end{equation}
+
+%------------------------------------------------------------
+\subsubsection{Derivation of the semismooth Newton step}
+
+Given an iterate $p_k\in H_0^2(\Omega)$, the semismooth Newton update is defined by
+\begin{equation}\label{eq:ssn_step_abstract}
+\partial_N F(p_k)\,(p_{k+1}-p_k) = -F(p_k).
+\end{equation}
+
+\paragraph{Active and inactive sets.}
+Set
+\begin{equation}\label{eq:active_sets_paper}
+A_k^+ := \{x\in\Omega:\ p_k(x)>\alpha\},\qquad
+A_k^- := \{x\in\Omega:\ p_k(x)<-\alpha\},\qquad
+A_k := A_k^+\cup A_k^-.
+\end{equation}
+Then $\chi_{\{|p_k|>\alpha\}}=\chi_{A_k}$ and \eqref{eq:ssn_step_abstract} becomes
+\[
+AA^\ast(p_{k+1}-p_k)+c(p_{k+1}-p_k)\chi_{A_k} = -\Bigl(AA^\ast p_k + cP_\alpha(p_k)+Az\Bigr).
+\]
+After rearranging and using $P_\alpha(p_k)=(p_k-\alpha)\chi_{A_k^+}+(p_k+\alpha)\chi_{A_k^-}$,
+one obtains the linear equation for $p_{k+1}$:
+\begin{equation}\label{eq:ssn_step_strong}
+\bigl(AA^\ast + c\,\chi_{A_k}\bigr)p_{k+1}
+=
+-Az + c\alpha\,\chi_{A_k^+} - c\alpha\,\chi_{A_k^-}.
+\end{equation}
+
+\paragraph{Weak form (the form used in the paper).}
+Testing \eqref{eq:ssn_step_strong} with $v\in H_0^2(\Omega)$ gives:
+find $p_{k+1}\in H_0^2(\Omega)$ such that
+\begin{equation}\label{eq:ssn_step_weak}
+\langle A^\ast p_{k+1},A^\ast v\rangle_{L^2}
++
+c\langle p_{k+1}\chi_{A_k},v\rangle_{L^2}
+=
+-\langle z, A^\ast v\rangle_{L^2}
++
+c\alpha\langle \chi_{A_k^+}-\chi_{A_k^-},v\rangle_{L^2}
+\end{equation}
+for all $v\in H_0^2(\Omega)$.
+
+%------------------------------------------------------------
+\subsubsection{Algorithm (paper version, with brief intuition)}
+
+\begin{algorithm}\label{alg:ssn_paper}
+\begin{enumerate}
+\item Choose $p_0\in H_0^2(\Omega)$ and set $k=0$.
+\item Repeat:
+\begin{enumerate}
+\item[(i)] Define active sets
+\[
+A_k^+ := \{p_k>\alpha\},\qquad A_k^- := \{p_k<-\alpha\},\qquad A_k:=A_k^+\cup A_k^-.
+\]
+\item[(ii)] Compute $p_{k+1}\in H_0^2(\Omega)$ by solving \eqref{eq:ssn_step_weak}.
+\item[(iii)] Set $k\leftarrow k+1$.
+\end{enumerate}
+\item Stop if $A_k^+=A_{k-1}^+$ and $A_k^-=A_{k-1}^-$.
+\end{enumerate}
+\end{algorithm}
+
+\paragraph{Why the stopping criterion makes sense.}
+If the active sets no longer change, the Newton derivative stays the same and the right-hand side in \eqref{eq_ssn_step_weak} is consistent with the nonlinear term.
+Consequently, the computed iterate already solves the nonlinear equation $F(p)=0$.
+
+\begin{proposition}[Active-set stationarity implies exactness]\label{prop:active_set_stop}
+If $A_{k+1}^+=A_k^+$ and $A_{k+1}^-=A_k^-$, then $p_{k+1}$ satisfies $F(p_{k+1})=0$, i.e.\ it solves \eqref{eq:opt_sys_reg}.
+\end{proposition}
+
+\begin{proof}
+Fix the sets $A_k^\pm$ and note that \eqref{eq:ssn_step_weak} has a unique solution for these fixed sets.
+If $A_{k+1}^\pm=A_k^\pm$, then on $A_{k+1}^+$ we have $p_{k+1}>\alpha$ and therefore
+\[
+c\,p_{k+1}\chi_{A_{k+1}^+}-c\alpha\chi_{A_{k+1}^+}=\max(0,c(p_{k+1}-\alpha)),
+\]
+and analogously on $A_{k+1}^-$,
+\[
+c\,p_{k+1}\chi_{A_{k+1}^-}+c\alpha\chi_{A_{k+1}^-}=\min(0,c(p_{k+1}+\alpha)).
+\]
+Inserting these identities into \eqref{eq:ssn_step_weak} shows that \eqref{eq:ssn_step_weak} is equivalent to
+$\langle F(p_{k+1}),v\rangle=0$ for all $v\in H_0^2(\Omega)$, i.e.\ $F(p_{k+1})=0$ in $H_0^2(\Omega)^\ast$.
+\end{proof}
+
+%------------------------------------------------------------
+\subsubsection{Superlinear convergence (paper theorem and proof in steps)}
+
+\begin{theorem}[Superlinear convergence of Algorithm~\ref{alg:ssn_paper}]
+\label{thm:ssn_superlinear_paper}
+If $\|p_c-p_0\|_{H_0^2(\Omega)}$ is sufficiently small, then the iterates $\{p_k\}$ generated by
+Algorithm~\ref{alg:ssn_paper} converge \emph{superlinearly} in $H_0^2(\Omega)$ to the unique solution $p_c$ of \eqref{eq:opt_sys_reg}.
+\end{theorem}
+
+\begin{proof}
+We follow \cite[Thm.~3.3]{ClasonKunisch2011}, and spell out the key estimate.
+
+\paragraph{Step 1: Reduce to a uniform inverse bound.}
+Since $F$ is semismooth, standard semismooth Newton theory implies superlinear convergence provided
+$(\partial_N F(p))^{-1}$ exists and is locally uniformly bounded near $p_c$
+(see \cite[Thm.~8.16]{ItoKunisch2008}).
+
+\paragraph{Step 2: Invertibility of the Newton derivative.}
+Fix a measurable set $A\subset\Omega$ and consider the linear operator
+\[
+\mathcal{L}_A: H_0^2(\Omega)\to H_0^2(\Omega)^\ast,
+\qquad
+\langle \mathcal{L}_A \varphi, v\rangle
+:= \langle A^\ast\varphi,A^\ast v\rangle_{L^2}
++ c\langle \chi_A\varphi, v\rangle_{L^2}.
+\]
+This is precisely $\partial_NF(p)$ with $A=\{|p|>\alpha\}$.
+By the assumptions on $A^\ast$ used throughout the paper (in particular that $\|A^\ast(\cdot)\|_{L^2}$ defines an equivalent norm on $H_0^2(\Omega)$),
+the bilinear form
+\[
+a_A(\varphi,v):=\langle A^\ast\varphi,A^\ast v\rangle_{L^2}+c\langle \chi_A\varphi,v\rangle_{L^2}
+\]
+is continuous and coercive on $H_0^2(\Omega)$, with coercivity constant \emph{independent of $A$}
+(since $c\langle\chi_A\varphi,\varphi\rangle_{L^2}\ge 0$ only improves coercivity).
+Hence, by Lax--Milgram, for every $g\in H_0^2(\Omega)^\ast$ there exists a unique $\varphi\in H_0^2(\Omega)$ such that
+\begin{equation}\label{eq:LM_variational}
+\langle A^\ast\varphi,A^\ast v\rangle_{L^2}+c\langle \chi_A\varphi,v\rangle_{L^2}
+=\langle g,v\rangle_{H_0^2(\Omega)^\ast,H_0^2(\Omega)}
+\qquad \forall v\in H_0^2(\Omega).
+\end{equation}
+Thus $\mathcal{L}_A$ is invertible.
+
+\paragraph{Step 3: Uniform bound for the inverse.}
+Coercivity of $a_A$ yields the estimate
+\[
+\|\varphi\|_{H_0^2(\Omega)} \le C \|g\|_{H_0^2(\Omega)^\ast},
+\]
+where $C$ depends only on $A$ (the PDE operator) and $\Omega$, but \emph{not} on $A\subset\Omega$.
+Equivalently,
+\[
+\|\mathcal{L}_A^{-1}\|_{\mathcal{L}(H_0^2(\Omega)^\ast,H_0^2(\Omega))}\le C,
+\]
+uniformly over all active sets $A$.
+
+\paragraph{Step 4: Apply semismooth Newton theory.}
+Taking $A=\{|p|>\alpha\}$, the uniform inverse bound from Step~3 gives the required hypothesis in \cite[Thm.~8.16]{ItoKunisch2008}.
+Therefore, for $p_0$ sufficiently close to $p_c$, the semismooth Newton iterates are well-defined and converge superlinearly to $p_c$ in $H_0^2(\Omega)$.
+\end{proof}
+
+\paragraph{Remark (link to primal--dual active sets).}
+Algorithm~\ref{alg:ssn_paper} is the primal--dual active set strategy in disguise:
+the update of $A_k^\pm$ is the ``active set'' step, and \eqref{eq:ssn_step_weak} is the corresponding linearized KKT system.
+The equivalence between both interpretations is classical; see \cite{HintermuellerItoKunisch2002}.
 
 
 
