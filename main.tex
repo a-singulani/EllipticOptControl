@@ -1523,7 +1523,7 @@ of Clason--Kunisch.
 
 It is, however, not the only viable approach. A conceptually different (and, at first glance, more
 ``direct'') route is developed in the FEM sequel \emph{Approximation of elliptic control problems in
-measure spaces with sparse solutions} (Casas--Clason--Kunisch). :contentReference[oaicite:1]{index=1}
+measure spaces with sparse solutions} (Casas--Clason--Kunisch).
 The key message of that paper is that one can discretize only the \emph{state equation} by nodal finite
 elements while keeping $u\in\mathcal M(\Omega)$ at the continuous level (``variational discretization''),
 and nevertheless obtain an \emph{intrinsically sparse} discrete control:
@@ -1541,7 +1541,6 @@ We recall the distributed measure-control model problem considered in the FEM se
 J(u)=\frac12\|y-y_d\|_{L^2(\Omega)}^2 + \alpha \|u\|_{\mathcal M(\Omega)},
 \quad\text{where }y\text{ solves }-\Delta y + c_0 y = u\text{ in }\Omega,\ y=0\text{ on }\Gamma .
 \]
-:contentReference[oaicite:3]{index=3}
 
 The approximation framework fixes a family of triangulations $\{\mathcal T_h\}_{h>0}$ and the nodal
 $P_1$ finite element space
@@ -1553,13 +1552,12 @@ $y_h(u)\in Y_h$ satisfying
 \begin{equation}\label{eq:sparsefem_state_discrete}
 a(y_h,z_h)=\int_{\Omega_h} z_h\,du\qquad\forall z_h\in Y_h,
 \end{equation}
-where $a(\cdot,\cdot)$ is the bilinear form of $-\Delta + c_0$. :contentReference[oaicite:4]{index=4}
+where $a(\cdot,\cdot)$ is the bilinear form of $-\Delta + c_0$. 
 This yields the discrete optimization problem
 \[
 (P_h)\qquad \min_{u\in\mathcal M(\Omega)}\;
 J_h(u)=\frac12\|y_h(u)-y_d\|_{L^2(\Omega_h)}^2 + \alpha \|u\|_{\mathcal M(\Omega)}.
 \]
-:contentReference[oaicite:5]{index=5}
 
 \medskip
 \noindent
@@ -1583,7 +1581,6 @@ and the operators $\Pi_h:C_0(\Omega)\to Y_h$ and $\Lambda_h:\mathcal M(\Omega)\t
 \qquad
 \Lambda_h u := \sum_{j=1}^{N(h)} \langle u,e_j\rangle\,\delta_{x_j}.
 \]
-:contentReference[oaicite:6]{index=6}
 
 \begin{theorem}[Canonical nodal Dirac replacement (Casas--Clason--Kunisch)]
 \label{thm:Lambda_h}
@@ -1638,7 +1635,7 @@ Thus, the discrete control can be written uniquely as
 \[
 \bar u_h=\sum_{j=1}^{N(h)}\bar\lambda_j\,\delta_{x_j},
 \]
-and computation reduces to the finite vector $(\bar\lambda_1,\dots,\bar\lambda_{N(h)})$. :contentReference[oaicite:9]{index=9}
+and computation reduces to the finite vector $(\bar\lambda_1,\dots,\bar\lambda_{N(h)})$. 
 
 %------------------------------------------------------------
 \subsection{Optimality structure and sparsity: adjoint saturation and discrete complementarity}
@@ -1657,7 +1654,6 @@ such that
 \le \alpha,& \bar u=0.
 \end{cases}
 \end{equation}
-:contentReference[oaicite:10]{index=10}
 In terms of the Jordan decomposition $\bar u=\bar u^+-\bar u^-$, one deduces the saturation/support rule
 \begin{equation}\label{eq:sparsefem_support}
 \supp(\bar u^+)\subset\{x:\bar\phi(x)=-\alpha\},
@@ -1674,7 +1670,7 @@ the variational inequality defining the normal cone to the $C_0$-ball can be rew
 + \min\!\bigl(0,\,-\bar u_h+\bar\phi_h+\alpha\bigr)=0,
 \end{equation}
 understood componentwise in the coefficient vectors $(\lambda_j)$ and $(\phi_j)$. 
-This is again amenable to a locally superlinearly convergent semismooth Newton method in finite dimension. :contentReference[oaicite:13]{index=13}
+This is again amenable to a locally superlinearly convergent semismooth Newton method in finite dimension. 
 
 %------------------------------------------------------------
 \subsection{Comparison with the predual strategy used in this report}
@@ -1698,7 +1694,7 @@ induces the canonical Dirac representative $\Lambda_h u$ and yields the componen
 \begin{itemize}
 \item \textbf{Predual.} Sparsity is encoded by the \emph{active set} $\{|p|=\alpha\}$ (or $\{|p|>\alpha\}$ at the
 regularized level), which enters directly in the Newton derivative via the characteristic function
-$\chi_{\{|p|>\alpha\}}$. :contentReference[oaicite:16]{index=16}
+$\chi_{\{|p|>\alpha\}}$. 
 \item \textbf{SparseFEM.} Sparsity is encoded by the smallness of the \emph{saturation set} $\{|\bar\phi|=\alpha\}$ in the
 continuous optimality system \eqref{eq:sparsefem_opt_23_24}--\eqref{eq:sparsefem_support}, and, after discretization,
 by the fact that the discrete optimizer \emph{is literally a finite sum of Diracs at nodes}. 
@@ -1719,7 +1715,7 @@ so that ``box activity'' in the predual formulation corresponds to ``adjoint sat
 support of the measure control in the primal formulation.
 
 \paragraph{(iv) What the FEM sequel adds conceptually.}
-The predual route motivates \emph{why} one should solve for $p$ in a Hilbert space rather than discretizing measures directly. :contentReference[oaicite:20]{index=20}
+The predual route motivates \emph{why} one should solve for $p$ in a Hilbert space rather than discretizing measures directly. 
 The FEM sequel complements this by showing that a straightforward nodal FEM approximation \emph{automatically}
 yields a canonical sparse surrogate of a measure control (Theorem~\ref{thm:Lambda_h}), thereby justifying the
 common practice of representing discrete measures by nodal Dirac sums—\emph{without losing the structural properties

@@ -1,0 +1,448 @@
+\documentclass[aspectratio=169]{beamer}
+
+% --------------------
+% Theme (clean + academic)
+% --------------------
+\usetheme{Madrid}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+
+% --------------------
+% Packages
+% --------------------
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{mathtools}
+\usepackage{bm}
+
+% --------------------
+% Shortcuts
+% --------------------
+\newcommand{\Om}{\Omega}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Cz}{C_0(\Om)}
+\newcommand{\ip}[2]{\left\langle #1,#2\right\rangle}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+
+% --------------------
+% Title info
+% --------------------
+\title[Elliptic Control with Measures]{Elliptic Optimal Control with Measure-Valued Controls}
+\subtitle{Predual reformulation, sparsity, and semismooth Newton numerics}
+\author{Anderson Singulani}
+\institute{Seminar}
+\date{January 21, 2026}
+
+\begin{document}
+
+% ============================================================
+% 1. TITLE
+% ============================================================
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ============================================================
+% 2. ROADMAP
+% ============================================================
+\begin{frame}{Roadmap (25 min)}
+\begin{itemize}
+  \item Motivation: localized actuation and sparsity
+  \item PDE with measure right-hand side: very weak solutions
+  \item Primal problem in $\M(\Om)$: existence/uniqueness
+  \item Fenchel duality $\Rightarrow$ predual (Hilbert space) with box constraints
+  \item KKT + sparsity structure (active set)
+  \item 1D gravity example: explicit Dirac solution + threshold
+  \item Numerics: Moreau--Yosida + semismooth Newton / PDAS
+  \item (Brief) alternative FEM route: nodal Dirac controls
+\end{itemize}
+\end{frame}
+
+% ============================================================
+% 3. MOTIVATION
+% ============================================================
+\begin{frame}{Motivation: why measure-valued controls?}
+\begin{block}{Localized actuation}
+Point sources/sinks, actuators, supports, injections are naturally \emph{low-dimensional} objects:
+Dirac masses, sums of Diracs, line/surface measures.
+\end{block}
+
+\begin{block}{Sparsity promotion}
+Replacing quadratic control cost by an $L^1$-type cost promotes sparsity.
+In PDE settings, the measure space $\M(\Om)$ is the natural closure/relaxation.
+\end{block}
+
+\begin{alertblock}{Main challenge}
+The problem is nonsmooth \emph{and} posed in a nonreflexive space $\M(\Om)$.
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+% 4. PDE WITH MEASURE DATA
+% ============================================================
+\begin{frame}{Elliptic PDE with measure right-hand side}
+We consider
+\[
+Ay = u \quad \text{in }\Om,\qquad y=0 \quad\text{on }\partial\Om,
+\qquad u\in \M(\Om).
+\]
+
+\begin{block}{Why not the usual $H^1_0$ formulation?}
+A general measure $u$ is \emph{not} in $H^{-1}(\Om)$, so
+testing with $v\in H^1_0(\Om)$ is too strong.
+\end{block}
+
+\begin{block}{Very weak formulation (Dirichlet)}
+Choose a test space $V \hookrightarrow C_0(\Om)$, e.g.
+$V = H^2(\Om)\cap H^1_0(\Om)$ (in $n=2,3$).
+Then $y\in L^1(\Om)$ solves
+\[
+\int_\Om y\, A^\ast \varphi\, dx = \int_\Om \varphi\, du
+\qquad \forall \varphi\in V.
+\]
+\end{block}
+\end{frame}
+
+% ============================================================
+% 5. REGULARITY / SOLUTION OPERATOR
+% ============================================================
+\begin{frame}{Regularity and the control-to-state map}
+\begin{block}{Elliptic smoothing for measure data}
+For $u\in \M(\Om)$, the very weak solution satisfies
+\[
+y \in W^{1,p}_0(\Om)\quad \text{for all } 1\le p < \frac{n}{n-1},
+\qquad
+\norm{y}_{W^{1,p}} \le C \norm{u}_{\M(\Om)}.
+\]
+\end{block}
+
+\begin{block}{Control-to-state operator}
+Define
+\[
+S:\M(\Om)\to L^2(\Om),\qquad Su = y(u),
+\]
+using Sobolev embedding $W^{1,p}_0(\Om)\hookrightarrow L^2(\Om)$ (for suitable $p$, $n\in\{2,3\}$).
+\end{block}
+
+\begin{alertblock}{Key takeaway}
+Even if $u$ is singular (Dirac), the state $y$ is a genuine function usable in an $L^2$ tracking term.
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+% 6. PRIMAL PROBLEM
+% ============================================================
+\begin{frame}{Primal sparse control problem in $\M(\Om)$}
+Given desired state $z\in L^2(\Om)$ and $\alpha>0$:
+\[
+\min_{u\in \M(\Om)}\;
+J(u):=\frac12 \norm{Su-z}_{L^2(\Om)}^2 + \alpha \norm{u}_{\M(\Om)}.
+\]
+
+\begin{block}{Interpretation}
+\begin{itemize}
+  \item $\frac12\norm{Su-z}^2$: match the target state
+  \item $\alpha\norm{u}_{\M}$: pay for total control mass $\Rightarrow$ sparse actuation
+\end{itemize}
+\end{block}
+
+\begin{alertblock}{Two difficulties}
+\begin{itemize}
+  \item Nonsmooth term $\norm{u}_\M$
+  \item Nonreflexive space $\M(\Om)$
+\end{itemize}
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+% 7. EXISTENCE / UNIQUENESS
+% ============================================================
+\begin{frame}{Existence and uniqueness (direct method)}
+\begin{block}{Compactness mechanism}
+\begin{itemize}
+  \item Minimizing sequence $(u_n)$ bounded in $\M(\Om)$
+  \item Banach--Alaoglu: $u_n \stackrel{\ast}{\rightharpoonup} u^\ast$ in $\sigma(\M(\Om), C_0(\Om))$
+  \item States $y_n=Su_n$ bounded in $W^{1,p}_0(\Om)$
+  \item Rellich: $y_n \to y^\ast$ strongly in $L^2(\Om)$
+\end{itemize}
+\end{block}
+
+\begin{block}{Lower semicontinuity}
+\[
+\norm{u^\ast}_\M \le \liminf_{n\to\infty}\norm{u_n}_\M,
+\qquad
+\norm{Su_n - z}_{L^2}^2 \to \norm{Su^\ast-z}_{L^2}^2.
+\]
+So $u^\ast$ is optimal.
+\end{block}
+
+\begin{alertblock}{Uniqueness}
+Strict convexity of the $L^2$ tracking term (and injectivity of $S$) gives uniqueness of the minimizer.
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+% 8. WHY PRE-DUAL?
+% ============================================================
+\begin{frame}{Why a predual formulation?}
+\begin{block}{Goal}
+Avoid discretizing measures directly and replace nonsmooth penalty by a simple constraint.
+\end{block}
+
+\begin{block}{Core idea (Fenchel duality)}
+The conjugate of $\alpha\norm{\cdot}_\M$ is the indicator of a box in $C_0(\Om)$:
+\[
+(\alpha\norm{\cdot}_\M)^\ast(\varphi)
+=
+\begin{cases}
+0, & \norm{\varphi}_\infty \le \alpha,\\
++\infty, & \text{otherwise}.
+\end{cases}
+\]
+\end{block}
+
+\begin{alertblock}{Computational win}
+Measure norm $\Rightarrow$ \emph{box constraint} on a smooth variable.
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+% 9. PRE-DUAL PROBLEM
+% ============================================================
+\begin{frame}{Predual problem (Hilbert space + box constraint)}
+In the measure-control setting, the dual variable satisfies
+\[
+p \in H^2(\Om)\cap H^1_0(\Om) \hookrightarrow C_0(\Om).
+\]
+
+\begin{block}{Predual formulation}
+\[
+\min_{p\in H^2(\Om)\cap H^1_0(\Om)}
+F(p):=\frac12 \norm{A^\ast p + z}_{L^2(\Om)}^2 - \frac12\norm{z}_{L^2(\Om)}^2
+\quad \text{s.t.}\quad \norm{p}_\infty \le \alpha.
+\]
+\end{block}
+
+\begin{alertblock}{Meaning}
+All nonsmoothness is now in a \emph{simple} pointwise constraint.
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+% 10. KKT CONDITIONS
+% ============================================================
+\begin{frame}{First-order optimality: KKT system}
+Let $K=\{p\in H^2\cap H^1_0:\norm{p}_\infty\le \alpha\}$.
+
+\begin{block}{Stationarity + normal cone}
+There exists a multiplier $\lambda^\ast \in N_K(p^\ast)$ such that
+\[
+\nabla F(p^\ast) + \lambda^\ast = 0,
+\qquad
+\lambda^\ast \in N_K(p^\ast).
+\]
+\end{block}
+
+\begin{block}{Identification of the primal control}
+The multiplier corresponds to the primal solution:
+\[
+\lambda^\ast = -u^\ast.
+\]
+So, once $p^\ast$ is computed, the optimal measure control is recovered.
+\end{block}
+\end{frame}
+
+% ============================================================
+% 11. SPARSITY / ACTIVE SET
+% ============================================================
+\begin{frame}{Sparsity structure from complementarity}
+\begin{block}{Saturation $\Rightarrow$ support of the measure}
+From $p^\ast\in \alpha\,\partial\norm{u^\ast}_\M$ one gets:
+\[
+\norm{p^\ast}_\infty \le \alpha,
+\qquad
+\ip{u^\ast}{p^\ast} = \alpha \norm{u^\ast}_\M.
+\]
+\end{block}
+
+\begin{alertblock}{Active set characterization}
+The measure cannot charge the inactive region:
+\[
+|u^\ast|\big(\{x:\ |p^\ast(x)|<\alpha\}\big)=0.
+\]
+Hence $u^\ast$ is supported where $|p^\ast|=\alpha$.
+\end{alertblock}
+
+\begin{block}{Sign information}
+\[
+u^\ast \ge 0 \text{ on }\{p^\ast=\alpha\},
+\qquad
+u^\ast \le 0 \text{ on }\{p^\ast=-\alpha\}.
+\]
+\end{block}
+\end{frame}
+
+% ============================================================
+% 12. EXAMPLE SETUP
+% ============================================================
+\begin{frame}{1D gravity example: tensioned string}
+Let $\Om=(0,1)$ and consider a string under gravity + actuator force $u$:
+\[
+-y_{\text{phys}}'' = 1+u \quad \text{in }\mathcal{D}'(0,1),\qquad
+y_{\text{phys}}(0)=y_{\text{phys}}(1)=0.
+\]
+
+\begin{block}{Shift to fit the abstract model}
+Gravity-only state:
+\[
+-y_g''=1,\quad y_g(0)=y_g(1)=0
+\quad\Rightarrow\quad
+y_g(x)=\frac{x(1-x)}{2}.
+\]
+Let $y:=y_{\text{phys}}-y_g$, then
+\[
+-y''=u,\qquad z(x)=-y_g(x)=-\frac{x(1-x)}{2}.
+\]
+\end{block}
+\end{frame}
+
+% ============================================================
+% 13. EXPLICIT SOLUTION
+% ============================================================
+\begin{frame}{Explicit optimal control: a single Dirac}
+In this example one can construct a symmetric solution where the constraint is active only at $x=\tfrac12$.
+
+\begin{block}{Result: optimal control is a Dirac}
+\[
+u^\ast = \left(48\alpha - \frac{5}{8}\right)\delta_{1/2}.
+\]
+\end{block}
+
+\begin{block}{Interpretation}
+The optimal actuator is concentrated exactly at the midpoint,
+where the dual variable saturates the box constraint.
+\end{block}
+
+\begin{alertblock}{Message}
+Sparse control is not just a slogan: it becomes a literal point actuator in 1D.
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+% 14. THRESHOLD FOR NO CONTROL
+% ============================================================
+\begin{frame}{When is it optimal to apply \emph{no control}?}
+The optimal control vanishes iff the unconstrained predual solution stays inside the box:
+\[
+u^\ast\equiv 0
+\quad \Longleftrightarrow \quad
+\norm{p_0}_\infty \le \alpha,
+\]
+where $p_0$ solves the unconstrained KKT equation.
+
+\begin{block}{Gravity example: sharp threshold}
+One computes
+\[
+\norm{p_0}_\infty = \frac{5}{384}.
+\]
+Hence
+\[
+u^\ast \equiv 0
+\quad \Longleftrightarrow \quad
+\alpha \ge \frac{5}{384}.
+\]
+\end{block}
+
+\begin{alertblock}{Economic meaning}
+Control appears only when its benefit exceeds its cost parameter $\alpha$.
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+% 15. NUMERICS: REGULARIZATION
+% ============================================================
+\begin{frame}{Numerics: Moreau--Yosida regularization of the box}
+\begin{block}{Problem}
+The constraint $\norm{p}_\infty\le \alpha$ is nonsmooth (active-set structure).
+
+\medskip
+Regularize the indicator of the box constraint (Moreau--Yosida),
+leading to a smooth approximation with parameter $\gamma>0$.
+\end{block}
+
+\begin{block}{Effect}
+\begin{itemize}
+  \item Allows Newton-type methods
+  \item Retains active-set interpretation
+  \item As $\gamma\to\infty$, solutions converge to the exact constrained problem
+\end{itemize}
+\end{block}
+\end{frame}
+
+% ============================================================
+% 16. NUMERICS: SEMISMOOTH NEWTON / PDAS
+% ============================================================
+\begin{frame}{Semismooth Newton / primal-dual active set (PDAS)}
+\begin{block}{High-level idea}
+Rewrite the optimality system as a semismooth equation and apply Newton with generalized derivatives.
+\end{block}
+
+\begin{block}{Algorithmic structure}
+\begin{itemize}
+  \item Given $(p^k,\lambda^k)$, define active set via saturation of $|p^k|$
+  \item Solve a linearized PDE system on inactive set
+  \item Update and repeat until active set stabilizes
+\end{itemize}
+\end{block}
+
+\begin{alertblock}{Performance}
+Locally superlinear convergence (under standard assumptions).
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+% 17. ALTERNATIVE ROUTE: FEM SEQUEL IDEA
+% ============================================================
+\begin{frame}{Alternative numerical route: variational discretization (FEM sequel)}
+\begin{block}{Different philosophy}
+Discretize only the \emph{state} equation by FEM, keep $u\in\M(\Om)$ continuous.
+\end{block}
+
+\begin{block}{Key theorem (informal)}
+The discrete optimizer can be chosen as a \emph{finite combination of Diracs at mesh nodes}:
+\[
+u_h^\ast = \sum_{j=1}^{N(h)} \lambda_j \delta_{x_j}.
+\]
+\end{block}
+
+\begin{alertblock}{Comparison}
+\begin{itemize}
+  \item Predual approach: smooth variable + box constraints + Newton
+  \item FEM sequel: state discretization induces nodal sparsity automatically
+\end{itemize}
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+% 18. CONCLUSION
+% ============================================================
+\begin{frame}{Conclusion}
+\begin{block}{Main messages}
+\begin{itemize}
+  \item Measure controls model localized actuation and yield sparse optimal solutions
+  \item Very weak solutions provide well-posed PDE state equations for $u\in\M(\Om)$
+  \item Fenchel duality gives a predual Hilbert-space formulation with $\norm{p}_\infty\le \alpha$
+  \item KKT structure explains sparsity: $u^\ast$ lives on the active set $\{|p^\ast|=\alpha\}$
+  \item 1D example: explicit Dirac optimal control + sharp no-control threshold
+\end{itemize}
+\end{block}
+
+\begin{alertblock}{Takeaway}
+Predual reformulation turns a difficult nonsmooth measure problem into a numerically friendly box-constrained PDE problem.
+\end{alertblock}
+
+\bigskip
+\centering
+\textbf{Thank you!}
+\end{frame}
+
+\end{document}

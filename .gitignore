@@ -9,3 +9,15 @@ main.log
 main.out
 main.toc
 main.synctex.gz
+presentation.aux
+.gitignore
+.gitignore
+presentation.fdb_latexmk
+presentation.fls
+presentation.log
+presentation.nav
+.gitignore
+presentation.out
+presentation.snm
+presentation.synctex.gz
+presentation.toc
