@@ -22,6 +22,7 @@
 \newcommand{\Cz}{C_0(\Om)}
 \newcommand{\ip}[2]{\left\langle #1,#2\right\rangle}
 \newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+\newcommand{\supp}{\operatorname{supp}}
 
 % --------------------
 % Title info
@@ -35,51 +36,56 @@
 \begin{document}
 
 % ============================================================
-% 1. TITLE
+% TITLE
 % ============================================================
 \begin{frame}
   \titlepage
 \end{frame}
 
 % ============================================================
-% 2. ROADMAP
+% ROADMAP
 % ============================================================
-\begin{frame}{Roadmap (25 min)}
+\begin{frame}{Roadmap}
 \begin{itemize}
   \item Motivation: localized actuation and sparsity
-  \item PDE with measure right-hand side: very weak solutions
-  \item Primal problem in $\M(\Om)$: existence/uniqueness
-  \item Fenchel duality $\Rightarrow$ predual (Hilbert space) with box constraints
-  \item KKT + sparsity structure (active set)
-  \item 1D gravity example: explicit Dirac solution + threshold
-  \item Numerics: Moreau--Yosida + semismooth Newton / PDAS
-  \item (Brief) alternative FEM route: nodal Dirac controls
+  \item Setup PDE with measure data
+  \item Optimization problem 
+  \item Optimality conditions and sparsity structure 
+  \item Numerics and regularization
+  \item Experiments
+  \item Conclusion
 \end{itemize}
 \end{frame}
 
 % ============================================================
-% 3. MOTIVATION
+% MOTIVATION
 % ============================================================
-\begin{frame}{Motivation: why measure-valued controls?}
-\begin{block}{Localized actuation}
-Point sources/sinks, actuators, supports, injections are naturally \emph{low-dimensional} objects:
-Dirac masses, sums of Diracs, line/surface measures.
+\begin{frame}{Motivation | why measure-valued controls?}
+
+\begin{block}{Localized actuation in the real world}
+Many control mechanisms are \emph{intrinsically concentrated} in space, e.g.
+\begin{itemize}
+  \item \textbf{Thermal control:} laser heating on a tiny spot, or micro-heaters on a chip (point-like heat sources).
+  \item \textbf{Semiconductor devices:} carrier injection/extraction at small contacts (point-electrodes). 
+  \item \textbf{Structural mechanics:} concentrated loads or actuators in beams/plates.
+\end{itemize}
 \end{block}
 
 \begin{block}{Sparsity promotion}
-Replacing quadratic control cost by an $L^1$-type cost promotes sparsity.
-In PDE settings, the measure space $\M(\Om)$ is the natural closure/relaxation.
+Replacing a quadratic control cost by an $L^1$-type cost promotes sparse actuation.
+In PDE settings, the measure space $\M(\Om)$ is the natural model.
 \end{block}
 
 \begin{alertblock}{Main challenge}
-The problem is nonsmooth \emph{and} posed in a nonreflexive space $\M(\Om)$.
+The problem is nonsmooth \emph{and} posed in the nonreflexive space $\M(\Om)$.
 \end{alertblock}
+
 \end{frame}
 
 % ============================================================
-% 4. PDE WITH MEASURE DATA
+% PDE WITH MEASURE DATA
 % ============================================================
-\begin{frame}{Elliptic PDE with measure right-hand side}
+\begin{frame}{Setup | Elliptic PDE with measure data}
 We consider
 \[
 Ay = u \quad \text{in }\Om,\qquad y=0 \quad\text{on }\partial\Om,
@@ -88,13 +94,13 @@ Ay = u \quad \text{in }\Om,\qquad y=0 \quad\text{on }\partial\Om,
 
 \begin{block}{Why not the usual $H^1_0$ formulation?}
 A general measure $u$ is \emph{not} in $H^{-1}(\Om)$, so
-testing with $v\in H^1_0(\Om)$ is too strong.
+testing with $v\in H^1_0(\Om)$ is not well-defined.
 \end{block}
 
 \begin{block}{Very weak formulation (Dirichlet)}
 Choose a test space $V \hookrightarrow C_0(\Om)$, e.g.
 $V = H^2(\Om)\cap H^1_0(\Om)$ (in $n=2,3$).
-Then $y\in L^1(\Om)$ solves
+Then there exist $y\in L^1(\Om)$ that solves
 \[
 \int_\Om y\, A^\ast \varphi\, dx = \int_\Om \varphi\, du
 \qquad \forall \varphi\in V.
@@ -103,9 +109,9 @@ Then $y\in L^1(\Om)$ solves
 \end{frame}
 
 % ============================================================
-% 5. REGULARITY / SOLUTION OPERATOR
+% REGULARITY / SOLUTION OPERATOR
 % ============================================================
-\begin{frame}{Regularity and the control-to-state map}
+\begin{frame}{Setup | Regularity and the solution map}
 \begin{block}{Elliptic smoothing for measure data}
 For $u\in \M(\Om)$, the very weak solution satisfies
 \[
@@ -115,7 +121,7 @@ y \in W^{1,p}_0(\Om)\quad \text{for all } 1\le p < \frac{n}{n-1},
 \]
 \end{block}
 
-\begin{block}{Control-to-state operator}
+\begin{block}{Solution operator}
 Define
 \[
 S:\M(\Om)\to L^2(\Om),\qquad Su = y(u),
@@ -129,9 +135,9 @@ Even if $u$ is singular (Dirac), the state $y$ is a genuine function usable in a
 \end{frame}
 
 % ============================================================
-% 6. PRIMAL PROBLEM
+% PRIMAL PROBLEM
 % ============================================================
-\begin{frame}{Primal sparse control problem in $\M(\Om)$}
+\begin{frame}{Optimization problem | Primal sparse control problem in $\M(\Om)$}
 Given desired state $z\in L^2(\Om)$ and $\alpha>0$:
 \[
 \min_{u\in \M(\Om)}\;
@@ -154,9 +160,9 @@ J(u):=\frac12 \norm{Su-z}_{L^2(\Om)}^2 + \alpha \norm{u}_{\M(\Om)}.
 \end{frame}
 
 % ============================================================
-% 7. EXISTENCE / UNIQUENESS
+% EXISTENCE / UNIQUENESS
 % ============================================================
-\begin{frame}{Existence and uniqueness (direct method)}
+\begin{frame}{Optimization problem | Existence and uniqueness (direct method)}
 \begin{block}{Compactness mechanism}
 \begin{itemize}
   \item Minimizing sequence $(u_n)$ bounded in $\M(\Om)$
@@ -171,19 +177,18 @@ J(u):=\frac12 \norm{Su-z}_{L^2(\Om)}^2 + \alpha \norm{u}_{\M(\Om)}.
 \norm{u^\ast}_\M \le \liminf_{n\to\infty}\norm{u_n}_\M,
 \qquad
 \norm{Su_n - z}_{L^2}^2 \to \norm{Su^\ast-z}_{L^2}^2.
-\]
-So $u^\ast$ is optimal.
+\] So $u^\ast$ is optimal.
 \end{block}
 
 \begin{alertblock}{Uniqueness}
-Strict convexity of the $L^2$ tracking term (and injectivity of $S$) gives uniqueness of the minimizer.
+Strict convexity of the $L^2$ norm (and injectivity of $S$) gives uniqueness of the minimizer.
 \end{alertblock}
 \end{frame}
 
 % ============================================================
-% 8. WHY PRE-DUAL?
+% WHY PRE-DUAL?
 % ============================================================
-\begin{frame}{Why a predual formulation?}
+\begin{frame}{Optimization problem | Why a predual formulation?}
 \begin{block}{Goal}
 Avoid discretizing measures directly and replace nonsmooth penalty by a simple constraint.
 \end{block}
@@ -206,9 +211,59 @@ Measure norm $\Rightarrow$ \emph{box constraint} on a smooth variable.
 \end{frame}
 
 % ============================================================
-% 9. PRE-DUAL PROBLEM
+% PRE-DUAL DERIVATION 1/2
 % ============================================================
-\begin{frame}{Predual problem (Hilbert space + box constraint)}
+\begin{frame}{Optimization problem | Deriving the predual (Step 1)}
+\begin{block}{Step 1: Reduced primal formulation}
+Let $S:\mathcal M(\Omega)\to L^2(\Omega)$ denote the control-to-state map $Su=y(u)$.
+The primal problem reads
+\[
+\min_{u\in\mathcal M(\Omega)}
+\; \frac12\|Su-z\|_{L^2(\Omega)}^2+\alpha\|u\|_{\mathcal M(\Omega)}.
+\]
+\end{block}
+\end{frame}
+
+
+% ============================================================
+% PRE-DUAL DERIVATION 2/2
+% ============================================================
+\begin{frame}{Optimization problem | Deriving the predual (Steps 2--5)}
+\vspace{-1mm}
+
+\begin{block}{Step 2--4: Idea (Fenchel duality)}
+\begin{itemize}
+  \item \textbf{Step 2:} Dualize the quadratic tracking term
+  \[
+  \frac12\|Su-z\|_{L^2}^2
+  \;=\;
+  \sup_{w\in L^2}\Bigl\{\langle Su-z,w\rangle-\frac12\|w\|_{L^2}^2\Bigr\}.
+  \]
+  \item \textbf{Step 3:} Move $S$ to the adjoint side: $\;\langle Su,w\rangle=\langle u,S^\ast w\rangle$,
+  and set $p:=S^\ast w\in C_0(\Omega)$.
+  \item \textbf{Step 4:} Eliminate $u$ using
+  \[
+  \sup_{u\in\mathcal M(\Omega)}\{\langle u,p\rangle-\alpha\|u\|_{\mathcal M}\}=0
+  \ \Longleftrightarrow\ 
+  \|p\|_\infty\le \alpha.
+  \]
+\end{itemize}
+\end{block}
+
+\begin{alertblock}{Step 5: Predual problem}
+\[
+\min_{p\in H^2(\Omega)\cap H_0^1(\Omega)}
+\Bigl[\frac12\|A^\ast p+z\|_{L^2(\Omega)}^2-\frac12\|z\|_{L^2(\Omega)}^2\Bigr]
+\quad\text{s.t.}\quad
+\|p\|_\infty\le \alpha.
+\]
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+% PRE-DUAL PROBLEM
+% ============================================================
+\begin{frame}{Optimization problem | Predual problem}
 In the measure-control setting, the dual variable satisfies
 \[
 p \in H^2(\Om)\cap H^1_0(\Om) \hookrightarrow C_0(\Om).
@@ -228,176 +283,187 @@ All nonsmoothness is now in a \emph{simple} pointwise constraint.
 \end{frame}
 
 % ============================================================
-% 10. KKT CONDITIONS
+% KKT DERIVATION 
 % ============================================================
-\begin{frame}{First-order optimality: KKT system}
-Let $K=\{p\in H^2\cap H^1_0:\norm{p}_\infty\le \alpha\}$.
+\begin{frame}{Optimality conditions | KKT conditions for the predual problem }
+\vspace{-1mm}
 
-\begin{block}{Stationarity + normal cone}
-There exists a multiplier $\lambda^\ast \in N_K(p^\ast)$ such that
+\begin{block}{Step 1: Compute the derivative of $F$}
 \[
-\nabla F(p^\ast) + \lambda^\ast = 0,
-\qquad
-\lambda^\ast \in N_K(p^\ast).
-\]
+\nabla F(p)=AA^\ast p + Az \in H_0^2(\Omega)^\ast.\]
 \end{block}
 
-\begin{block}{Identification of the primal control}
-The multiplier corresponds to the primal solution:
+\begin{block}{Step 2: KKT condition via subdifferentials}
+Since $F$ is convex and Fr\'echet differentiable and $K$ is closed convex,
 \[
-\lambda^\ast = -u^\ast.
-\]
-So, once $p^\ast$ is computed, the optimal measure control is recovered.
-\end{block}
-\end{frame}
+0\in \partial(F+I_K)(p^\ast)=\nabla F(p^\ast)+\partial I_K(p^\ast).
+\iff \exists\,\lambda^\ast\in N_K(p^\ast)\ \nabla F(p^\ast)+\lambda^\ast=0. \]
 
-% ============================================================
-% 11. SPARSITY / ACTIVE SET
-% ============================================================
-\begin{frame}{Sparsity structure from complementarity}
-\begin{block}{Saturation $\Rightarrow$ support of the measure}
-From $p^\ast\in \alpha\,\partial\norm{u^\ast}_\M$ one gets:
-\[
-\norm{p^\ast}_\infty \le \alpha,
-\qquad
-\ip{u^\ast}{p^\ast} = \alpha \norm{u^\ast}_\M.
-\]
 \end{block}
 
-\begin{alertblock}{Active set characterization}
-The measure cannot charge the inactive region:
+\begin{alertblock}{Step 3: KKT system (stationarity + variational inequality)}
+Find $(p^\ast,\lambda^\ast)\in H_0^2(\Omega)\times H_0^2(\Omega)^\ast$ such that
 \[
-|u^\ast|\big(\{x:\ |p^\ast(x)|<\alpha\}\big)=0.
+AA^\ast p^\ast + Az + \lambda^\ast = 0 \quad\text{in } H_0^2(\Omega)^\ast,
 \]
-Hence $u^\ast$ is supported where $|p^\ast|=\alpha$.
+\[
+\langle \lambda^\ast,\,p-p^\ast\rangle_{H_0^2{}^\ast,H_0^2}\le 0
+\quad \forall\,p\in H_0^2(\Omega)\ \text{with }\|p\|_{C_0}\le \alpha. \]
 \end{alertblock}
 
-\begin{block}{Sign information}
+\end{frame}
+
+
+% ============================================================
+% PRIMAL IDENTIFICATION + SPARSITY THEOREM
+% ============================================================
+\begin{frame}{Optimality conditions | Primal identification and sparsity }
+\vspace{-1mm}
+
+\begin{block}{Identify the primal solution $u^\ast$}
+From the saddle-point / KKT system one obtains
 \[
-u^\ast \ge 0 \text{ on }\{p^\ast=\alpha\},
+\lambda^\ast \in \partial I_K(p^\ast)=N_K(p^\ast)
+\qquad\Longleftrightarrow\qquad
+u^\ast := -\lambda^\ast \in \mathcal M(\Omega)
+\]
+\end{block}
+
+\begin{block}{Sparsity / sign property}
+For every test function $\psi\in C_c(\Omega)$ with $\psi\ge 0$:
+\[
+\langle u^\ast,\psi\rangle = 0
+\quad \text{if }\supp(\psi)\subset\{|p^\ast|<\alpha\},
+\]
+\[
+\langle u^\ast,\psi\rangle \ge 0
+\quad \text{if }\supp(\psi)\subset\{p^\ast=\alpha\},
 \qquad
-u^\ast \le 0 \text{ on }\{p^\ast=-\alpha\}.
+\langle u^\ast,\psi\rangle \le 0
+\quad \text{if }\supp(\psi)\subset\{p^\ast=-\alpha\}.
 \]
 \end{block}
+
 \end{frame}
 
 % ============================================================
-% 12. EXAMPLE SETUP
+% NUMERICS: REGULARIZATION
 % ============================================================
-\begin{frame}{1D gravity example: tensioned string}
-Let $\Om=(0,1)$ and consider a string under gravity + actuator force $u$:
-\[
--y_{\text{phys}}'' = 1+u \quad \text{in }\mathcal{D}'(0,1),\qquad
-y_{\text{phys}}(0)=y_{\text{phys}}(1)=0.
-\]
-
-\begin{block}{Shift to fit the abstract model}
-Gravity-only state:
-\[
--y_g''=1,\quad y_g(0)=y_g(1)=0
-\quad\Rightarrow\quad
-y_g(x)=\frac{x(1-x)}{2}.
-\]
-Let $y:=y_{\text{phys}}-y_g$, then
-\[
--y''=u,\qquad z(x)=-y_g(x)=-\frac{x(1-x)}{2}.
-\]
-\end{block}
-\end{frame}
-
-% ============================================================
-% 13. EXPLICIT SOLUTION
-% ============================================================
-\begin{frame}{Explicit optimal control: a single Dirac}
-In this example one can construct a symmetric solution where the constraint is active only at $x=\tfrac12$.
-
-\begin{block}{Result: optimal control is a Dirac}
-\[
-u^\ast = \left(48\alpha - \frac{5}{8}\right)\delta_{1/2}.
-\]
-\end{block}
-
-\begin{block}{Interpretation}
-The optimal actuator is concentrated exactly at the midpoint,
-where the dual variable saturates the box constraint.
-\end{block}
-
-\begin{alertblock}{Message}
-Sparse control is not just a slogan: it becomes a literal point actuator in 1D.
-\end{alertblock}
-\end{frame}
-
-% ============================================================
-% 14. THRESHOLD FOR NO CONTROL
-% ============================================================
-\begin{frame}{When is it optimal to apply \emph{no control}?}
-The optimal control vanishes iff the unconstrained predual solution stays inside the box:
-\[
-u^\ast\equiv 0
-\quad \Longleftrightarrow \quad
-\norm{p_0}_\infty \le \alpha,
-\]
-where $p_0$ solves the unconstrained KKT equation.
-
-\begin{block}{Gravity example: sharp threshold}
-One computes
-\[
-\norm{p_0}_\infty = \frac{5}{384}.
-\]
-Hence
-\[
-u^\ast \equiv 0
-\quad \Longleftrightarrow \quad
-\alpha \ge \frac{5}{384}.
-\]
-\end{block}
-
-\begin{alertblock}{Economic meaning}
-Control appears only when its benefit exceeds its cost parameter $\alpha$.
-\end{alertblock}
-\end{frame}
-
-% ============================================================
-% 15. NUMERICS: REGULARIZATION
-% ============================================================
-\begin{frame}{Numerics: Moreau--Yosida regularization of the box}
+\begin{frame}{Numerics and regularization | Moreau--Yosida regularization of the box}
 \begin{block}{Problem}
 The constraint $\norm{p}_\infty\le \alpha$ is nonsmooth (active-set structure).
-
-\medskip
-Regularize the indicator of the box constraint (Moreau--Yosida),
-leading to a smooth approximation with parameter $\gamma>0$.
 \end{block}
 
 \begin{block}{Effect}
-\begin{itemize}
-  \item Allows Newton-type methods
-  \item Retains active-set interpretation
-  \item As $\gamma\to\infty$, solutions converge to the exact constrained problem
-\end{itemize}
+Allows Newton-type methods
 \end{block}
+
+\begin{block}{Regularized predual problem $(P^\ast_{M,c})$}
+For $c>0$, let $p_c\in H_0^2(\Omega)$ be the unique minimizer of
+\[
+\frac12\|A^\ast p+z\|_{L^2(\Omega)}^2-\frac12\|z\|_{L^2(\Omega)}^2
++\frac{1}{2c}\|\max(0,c(p-\alpha))\|_{L^2}^2
++\frac{1}{2c}\|\min(0,c(p+\alpha))\|_{L^2}^2,
+\]
+and define
+\[
+\lambda_c:=\max(0,c(p_c-\alpha))+\min(0,c(p_c+\alpha)).
+\]
+Then $(p_c,\lambda_c)$ solves $AA^\ast p_c+Az+\lambda_c=0$.
+\end{block}
+
 \end{frame}
 
 % ============================================================
-% 16. NUMERICS: SEMISMOOTH NEWTON / PDAS
+% CONVERGENCE OF THE REGULARIZATION 
 % ============================================================
-\begin{frame}{Semismooth Newton / primal-dual active set (PDAS)}
-\begin{block}{High-level idea}
-Rewrite the optimality system as a semismooth equation and apply Newton with generalized derivatives.
-\end{block}
+\begin{frame}{Numerics and regularization | Convergence of the Moreau--Yosida}
+\small
+\vspace{-1mm}
 
-\begin{block}{Algorithmic structure}
-\begin{itemize}
-  \item Given $(p^k,\lambda^k)$, define active set via saturation of $|p^k|$
-  \item Solve a linearized PDE system on inactive set
-  \item Update and repeat until active set stabilizes
-\end{itemize}
-\end{block}
 
-\begin{alertblock}{Performance}
-Locally superlinear convergence (under standard assumptions).
+
+\begin{alertblock}{Theorem (Convergence as $c\to\infty$)}
+Let $(p^\ast,\lambda^\ast)$ be the unique KKT solution of the unregularized box-constrained problem.
+Then, as $c\to\infty$,
+\[
+p_c \to p^\ast \ \text{strongly in } H_0^2(\Omega),
+\qquad
+\lambda_c \rightharpoonup \lambda^\ast \ \text{weakly in } H_0^2(\Omega)^\ast.
+\]
 \end{alertblock}
+
+\begin{block}{Proof idea }
+\begin{enumerate}
+\item (Key inequality) From the pointwise definition: $\;\langle \lambda_c,p_c\rangle_{L^2}\ge \frac1c\|\lambda_c\|_{L^2}^2$.
+\item (Uniform bounds) Test $AA^\ast p_c+Az+\lambda_c=0$ with $p_c$ to bound $\|p_c\|_{H_0^2}$ and $\frac1c\|\lambda_c\|_{L^2}^2$.
+\item (Subsequence limits) Extract $(p_c,\lambda_c)\rightharpoonup (\tilde p,\tilde\lambda)$ in $H_0^2\times H_0^2{}^\ast$ (Banach--Alaoglu).
+\item (Feasibility) The penalties $\max(0,p_c-\alpha)$, $\min(0,p_c+\alpha)$ vanish in $L^2$ $\Rightarrow$ $|\tilde p|\le \alpha$ a.e.
+\item (Strong conv.) Use weak l.s.c.\ to get $\|A^\ast p_c\|_{L^2}\to \|A^\ast\tilde p\|_{L^2}$, hence $p_c\to\tilde p$ in $H_0^2$.
+\item (Limit KKT) Limit in the variational inequality to show $(\tilde p,\tilde\lambda)$ solves the unreg. KKT system.
+\item (Uniqueness) Conclude $(\tilde p,\tilde\lambda)=(p^\ast,\lambda^\ast)$ and thus the whole family converges.
+\end{enumerate}
+\end{block}
+
 \end{frame}
+
+
+% ============================================================
+% ALGORITHM: Semismooth Newton 
+% ============================================================
+\begin{frame}{Numerics and regularization | Algorithm: Semismooth Newton}
+\small
+\vspace{-1mm}
+
+\begin{block}{Goal}
+Solve the regularized optimality system $F(p)=0$ for $p_c\in H_0^2(\Omega)$
+via an active-set (piecewise linear) Newton iteration.
+\end{block}
+
+\begin{enumerate}
+\item Choose an initial guess $p^0\in H_0^2(\Omega)$ and set $k=0$.
+\item Repeat:
+\begin{enumerate}
+\item[(i)] Define the active sets
+\[
+A_k^+ := \{x\in\Omega:\ p^k(x)>\alpha\},
+\qquad
+A_k^- := \{x\in\Omega:\ p^k(x)<-\alpha\},
+\qquad
+A_k := A_k^+\cup A_k^- .
+\]
+\item[(ii)] Compute $p^{k+1}\in H_0^2(\Omega)$ by solving the linear equation (weak form)
+\[
+\langle A^\ast p^{k+1},A^\ast v\rangle_{L^2}
++ c\langle p^{k+1}\chi_{A_k},v\rangle_{L^2}
+=
+-\langle z,A^\ast v\rangle_{L^2}
++ c\alpha\langle \chi_{A_k^+}-\chi_{A_k^-},v\rangle_{L^2}
+\quad \forall v\in H_0^2(\Omega).
+\]
+\item[(iii)] Set $k\leftarrow k+1$.
+\end{enumerate}
+\item Stop if $A_k^+=A_{k-1}^+$ and $A_k^-=A_{k-1}^-$.
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Experiments | Basic example}
+    
+\end{frame}
+
+\begin{frame}{Experiments | Semiconductor example}
+    
+\end{frame}
+
+\begin{frame}{Experiments | Semiconductor example}
+    
+\end{frame}
+
+\begin{frame}{Experiments | Semiconductor example}
+    
+\end{frame}
+
 
 % ============================================================
 % 17. ALTERNATIVE ROUTE: FEM SEQUEL IDEA
@@ -431,8 +497,7 @@ u_h^\ast = \sum_{j=1}^{N(h)} \lambda_j \delta_{x_j}.
   \item Measure controls model localized actuation and yield sparse optimal solutions
   \item Very weak solutions provide well-posed PDE state equations for $u\in\M(\Om)$
   \item Fenchel duality gives a predual Hilbert-space formulation with $\norm{p}_\infty\le \alpha$
-  \item KKT structure explains sparsity: $u^\ast$ lives on the active set $\{|p^\ast|=\alpha\}$
-  \item 1D example: explicit Dirac optimal control + sharp no-control threshold
+  \item KKT structure explains sparsity: $u^\ast$ lives on the active set $\{|p^\ast|=\alpha\}$ 
 \end{itemize}
 \end{block}
 

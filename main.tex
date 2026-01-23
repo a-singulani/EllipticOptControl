@@ -1920,81 +1920,8 @@ Theorem~\ref{thm:MY_convergence} provides the rigorous justification for the num
 
 In conclusion, this regularization scheme is not only an algorithmic trick to make Newton work; it is a \emph{consistent approximation} of the original constrained problem, and Theorem~\ref{thm:MY_convergence} is the bridge between the computed $(p_c,\lambda_c)$ and the true KKT pair $(p^\ast,\lambda^\ast)$.
 
-\subsection{Semismooth Newton method for the regularized predual problem (measure case)}
-\label{sec:ssn}
-
-\paragraph{Starting point: the regularized optimality system.}
-Fix a Moreau--Yosida parameter $c>0$ and recall the regularized optimality system (cf.\ \cite[Sec.~3.2]{ClasonKunisch2011})
-\begin{equation}\label{eq:opt_sys_reg}
-AA^\ast p_c + \lambda_c + Az = 0,
-\qquad
-\lambda_c = \max\!\bigl(0,c(p_c-\alpha)\bigr)+\min\!\bigl(0,c(p_c+\alpha)\bigr),
-\end{equation}
-where $\max$ and $\min$ are taken pointwise a.e.\ in $\Omega$.
-The goal is to solve \eqref{eq:opt_sys_reg} efficiently for $p_c\in H_0^2(\Omega)$.
-
-\paragraph{Intuitive idea (why ``active sets'' appear).}
-The mapping
-\[
-p \longmapsto \max\!\bigl(0,c(p-\alpha)\bigr)+\min\!\bigl(0,c(p+\alpha)\bigr)
-\]
-is \emph{piecewise affine} in $p$:
-\[
-\max(0,c(p-\alpha))=
-\begin{cases}
-c(p-\alpha), & p>\alpha,\\
-0, & p\le \alpha,
-\end{cases}
-\qquad
-\min(0,c(p+\alpha))=
-\begin{cases}
-0, & p\ge -\alpha,\\
-c(p+\alpha), & p<- \alpha.
-\end{cases}
-\]
-Hence, if we already knew where $p$ violates the bounds $\pm\alpha$, the term is simply linear there and zero elsewhere.
-This motivates the following strategy:
-\begin{quote}
-\emph{Guess the regions where $p$ is active (i.e.\ outside $[-\alpha,\alpha]$), then solve the linear equation corresponding to that guess, then update the guess.}
-\end{quote}
-Semismooth Newton makes this precise and yields a fast method with superlinear convergence.
-
 %------------------------------------------------------------
-\subsubsection{Reformulation as a semismooth equation}
-
-Define the nonlinear operator $F:H_0^2(\Omega)\to H_0^2(\Omega)^\ast$ by
-\begin{equation}\label{eq:F_def_paper}
-F(p):= AA^\ast p \;+\; \max\!\bigl(0,c(p-\alpha)\bigr)\;+\;\min\!\bigl(0,c(p+\alpha)\bigr)\;+\;Az.
-\end{equation}
-Then \eqref{eq:opt_sys_reg} is equivalent to the root-finding problem
-\begin{equation}\label{eq:F_root}
-F(p)=0 \quad \text{in } H_0^2(\Omega)^\ast.
-\end{equation}
-
-Introduce the projection-type operator
-\begin{equation}\label{eq:Palpha}
-P_\alpha(p):=\max(0,p-\alpha)+\min(0,p+\alpha),
-\end{equation}
-so that $F(p)=AA^\ast p + c\,P_\alpha(p)+Az$.
-
-\paragraph{Semismoothness and Newton derivative (as in the paper).}
-It is known (see \cite[Ex.~8.14]{ItoKunisch2008}) that $P_\alpha$ is semismooth from $L^q(\Omega)$ to $L^p(\Omega)$ if $q>p$,
-and that a Newton derivative is given by
-\begin{equation}\label{eq:Newton_derivative_Palpha}
-\partial_N P_\alpha(p)h = h\,\chi_{\{|p|>\alpha\}}
-=
-\begin{cases}
-h(x), & |p(x)|>\alpha,\\
-0, & |p(x)|\le \alpha.
-\end{cases}
-\end{equation}
-Since $AA^\ast$ is linear and Fr\'echet differentiable, it follows that $F$ is semismooth and
-\begin{equation}\label{eq:Newton_derivative_F}
-\partial_N F(p)h \;=\; AA^\ast h \;+\; c\,h\,\chi_{\{|p|>\alpha\}}.
-\end{equation}
-
-%------------------------------------------------------------
-\subsection{Semismooth Newton method for the regularized predual problem (measure case)}
+\subsection{Semismooth Newton method for the regularized predual problem}
 \label{sec:ssn}
 
 \paragraph{Starting point: the regularized optimality system.}
@@ -2109,7 +2036,7 @@ c\alpha\langle \chi_{A_k^+}-\chi_{A_k^-},v\rangle_{L^2}
 for all $v\in H_0^2(\Omega)$.
 
 %------------------------------------------------------------
-\subsubsection{Algorithm (paper version, with brief intuition)}
+\subsubsection{Algorithm}
 
 \begin{algorithm}\label{alg:ssn_paper}
 \begin{enumerate}
