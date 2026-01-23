@@ -453,12 +453,54 @@ A_k := A_k^+\cup A_k^- .
 \end{frame}
 
 \begin{frame}{Experiments | Semiconductor example}
-    
+\small
+\textbf{Context.}
+We consider a steady-state concentration $y$ of a species in a bounded domain $\Omega \subset \mathbb{R}^2$
+(with $y=0$ on $\partial\Omega$). Species are \emph{generated} in a localized subregion and can be
+\emph{removed} by placing sinks. We want the sinks to be \emph{spatially sparse}. This is a simplified description of a photodiode in steady-state operation
+
+\medskip
+\textbf{State equation (diffusion).}
+With diffusion coefficient $D>0$ and operator
+\[
+A_D := -D\Delta,\qquad y|_{\partial\Omega}=0,
+\]
+the steady-state balance reads
+\[
+A_D y \;=\; g - u \quad \text{in }\Omega,
+\]
+where $g$ is a prescribed generation term (here: constant on a small central square, $0$ outside)
+and $u$ is the sink control.
+
+\medskip
+\textbf{Optimal control problem (measure-sparse control).}
+We set the desired target to $z\equiv 0$ (remove species everywhere) and penalize the sink by a
+\emph{measure norm} to promote sparsity:
+\[
+\min_{u\in \mathcal{M}(\Omega)}\;
+\frac12\|y(u)-z\|_{L^2(\Omega)}^2 \;+\; \alpha \|u\|_{\mathcal{M}(\Omega)}
+\qquad\text{s.t.}\qquad
+A_D y = g-u,\; y|_{\partial\Omega}=0.
+\]
+Here $\alpha>0$ controls the sparsity strength: larger $\alpha$ yields fewer/stronger sink locations.
 \end{frame}
 
 \begin{frame}{Experiments | Semiconductor example}
     
+\small
+
+\textit{Numerical solution on $\Omega=[-1,1]^2$ (Dirichlet BC), $D=0.5$.}
+
+\vspace{0.3em}
+\includegraphics[width=\linewidth]{result_semic_1.png}
+
+\vspace{-4em}
+The optimized sink $u$ concentrates on a very thin ring surrounding the generation region.
+This structure is a direct consequence of the measure penalty, which promotes sparsity by
+localizing the control on sets of small measure. Despite its narrow support, the sink efficiently
+removes the species due to diffusion, resulting in a low concentration $y$ throughout the domain.
 \end{frame}
+
 
 \begin{frame}{Experiments | Semiconductor example}
     
