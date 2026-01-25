@@ -1510,216 +1510,7 @@ In particular, for $\alpha \ge 5/384$, the gravitational deformation is tolerate
 without actuation, while for smaller values of $\alpha$ the optimal strategy
 introduces sparse point actuators.
 
-\section{Conceptual comparison: predual reformulation vs.\ variational discretization (SparseFEM as sequel)}
-\label{sec:comparison_sparsefem}
 
-\subsection{A remark on alternative numerical routes}
-In the previous sections of this report, our guiding principle was to \emph{avoid} a direct discretization of
-controls in $\mathcal M(\Omega)$ by passing to a \emph{predual} formulation. In that approach, the predual
-variable $p$ lives in a Hilbert space and the non-smooth measure norm reappears as a \emph{box constraint}
-on $p$; the resulting optimality system can then be treated efficiently by a semismooth Newton method
-based on active sets. This is precisely the philosophy advocated in the duality-based paper
-of Clason--Kunisch. 
-
-It is, however, not the only viable approach. A conceptually different (and, at first glance, more
-``direct'') route is developed in the FEM sequel \emph{Approximation of elliptic control problems in
-measure spaces with sparse solutions} (Casas--Clason--Kunisch).
-The key message of that paper is that one can discretize only the \emph{state equation} by nodal finite
-elements while keeping $u\in\mathcal M(\Omega)$ at the continuous level (``variational discretization''),
-and nevertheless obtain an \emph{intrinsically sparse} discrete control:
-the discrete optimizer can be chosen (uniquely) as a \emph{finite linear combination of Dirac measures at
-mesh nodes}. 
-
-The goal of this section is to (i) explain the main idea of this FEM approach, (ii) state its central theorem,
-and (iii) compare it with the predual strategy used in this report.
-
-%------------------------------------------------------------
-\subsection{Main idea of the FEM sequel: discretize the state, and sparsity becomes nodal}
-We recall the distributed measure-control model problem considered in the FEM sequel:
-\[
-(P)\qquad \min_{u\in\mathcal M(\Omega)}\;
-J(u)=\frac12\|y-y_d\|_{L^2(\Omega)}^2 + \alpha \|u\|_{\mathcal M(\Omega)},
-\quad\text{where }y\text{ solves }-\Delta y + c_0 y = u\text{ in }\Omega,\ y=0\text{ on }\Gamma .
-\]
-
-The approximation framework fixes a family of triangulations $\{\mathcal T_h\}_{h>0}$ and the nodal
-$P_1$ finite element space
-\[
-Y_h := \{y_h\in C_0(\Omega): y_h|_{T}\in \mathbb P_1\ \forall T\in\mathcal T_h\}.
-\]
-The discrete state associated with a \emph{measure} $u\in\mathcal M(\Omega)$ is then defined as the unique
-$y_h(u)\in Y_h$ satisfying
-\begin{equation}\label{eq:sparsefem_state_discrete}
-a(y_h,z_h)=\int_{\Omega_h} z_h\,du\qquad\forall z_h\in Y_h,
-\end{equation}
-where $a(\cdot,\cdot)$ is the bilinear form of $-\Delta + c_0$. 
-This yields the discrete optimization problem
-\[
-(P_h)\qquad \min_{u\in\mathcal M(\Omega)}\;
-J_h(u)=\frac12\|y_h(u)-y_d\|_{L^2(\Omega_h)}^2 + \alpha \|u\|_{\mathcal M(\Omega)}.
-\]
-
-\medskip
-\noindent
-\textbf{The conceptual surprise.}
-At this point the control space has \emph{not} been discretized. Nonetheless, the FEM sequel proves that
-the discrete state equation \eqref{eq:sparsefem_state_discrete} only ``sees'' $u$ through its action on the
-nodal basis. This induces a canonical operator that replaces an arbitrary measure by a Dirac combination
-at mesh nodes \emph{without changing the discrete state}. This is the mechanism that turns sparsity into
-a concrete, finite-dimensional structure.
-
-%------------------------------------------------------------
-\subsection{The central theorem: a canonical Dirac projection $\Lambda_h$}
-Let $\{x_j\}_{j=1}^{N(h)}$ denote the interior nodes of $\mathcal T_h$ and $\{e_j\}_{j=1}^{N(h)}$ the nodal basis
-of $Y_h$. Define the \emph{nodal Dirac space}
-\[
-D_h := \left\{u_h\in\mathcal M(\Omega): u_h=\sum_{j=1}^{N(h)}\lambda_j\,\delta_{x_j}\right\},
-\]
-and the operators $\Pi_h:C_0(\Omega)\to Y_h$ and $\Lambda_h:\mathcal M(\Omega)\to D_h$ by
-\[
-\Pi_h z := \sum_{j=1}^{N(h)} z(x_j)\,e_j,
-\qquad
-\Lambda_h u := \sum_{j=1}^{N(h)} \langle u,e_j\rangle\,\delta_{x_j}.
-\]
-
-\begin{theorem}[Canonical nodal Dirac replacement (Casas--Clason--Kunisch)]
-\label{thm:Lambda_h}
-The following properties hold:
-\begin{enumerate}
-\item For every $u\in\mathcal M(\Omega)$, $z\in C_0(\Omega)$ and $z_h\in Y_h$,
-\begin{align}
-\label{eq:Lambda_pairing_FE}
-\langle u,z_h\rangle &= \langle \Lambda_h u, z_h\rangle,\\
-\label{eq:Lambda_pairing_interp}
-\langle u,\Pi_h z\rangle &= \langle \Lambda_h u, z\rangle .
-\end{align}
-\item The mapping is norm-decreasing and consistent:
-\begin{equation}\label{eq:Lambda_norm_and_convergence}
-\|\Lambda_h u\|_{\mathcal M(\Omega)}\le \|u\|_{\mathcal M(\Omega)},\qquad
-\Lambda_h u \stackrel{*}{\rightharpoonup} u\ \text{ in }\mathcal M(\Omega),\qquad
-\|\Lambda_h u\|_{\mathcal M(\Omega)}\to \|u\|_{\mathcal M(\Omega)}.
-\end{equation}
-\item There exists $C>0$ such that for $1<p<\frac{n}{n-1}$,
-\[
-\|u-\Lambda_h u\|_{W^{-1,p}(\Omega)} \le C\,h^{\,1-n/p'}\|u\|_{\mathcal M(\Omega)},
-\]
-(with an analogous bound in $(W^{1,\infty}_0(\Omega))^*$).
-\item Let $y_h$ and $\tilde y_h$ be the solutions of the discrete state equation
-\eqref{eq:sparsefem_state_discrete} corresponding to $u$ and $\Lambda_h u$, respectively.
-Then
-\[
-y_h=\tilde y_h .
-\]
-\end{enumerate}
-\end{theorem}
-
-
-\medskip
-\noindent
-\textbf{Interpretation.}
-Item~4 is the pivotal point: \emph{once the PDE is discretized in $Y_h$, replacing $u$ by the nodal Dirac
-combination $\Lambda_h u$ leaves the discrete state unchanged.} Hence, for the discrete problem,
-``Dirac-at-nodes'' controls are not a heuristic—they are the \emph{canonical representatives} of equivalence
-classes of measures that produce the same discrete state.
-
-A direct consequence is that although $(P_h)$ may have multiple minimizers in $\mathcal M(\Omega)$, there is
-a unique minimizer in $D_h$, and every minimizer collapses to it under $\Lambda_h$:
-\begin{theorem}[Uniqueness in $D_h$]
-\label{thm:unique_in_Dh}
-Problem $(P_h)$ admits at least one solution. Among them there exists a unique one $\bar u_h\in D_h$.
-Moreover, any other solution $\tilde u_h\in\mathcal M(\Omega)$ satisfies $\Lambda_h\tilde u_h=\bar u_h$.
-\end{theorem}
-
-
-Thus, the discrete control can be written uniquely as
-\[
-\bar u_h=\sum_{j=1}^{N(h)}\bar\lambda_j\,\delta_{x_j},
-\]
-and computation reduces to the finite vector $(\bar\lambda_1,\dots,\bar\lambda_{N(h)})$. 
-
-%------------------------------------------------------------
-\subsection{Optimality structure and sparsity: adjoint saturation and discrete complementarity}
-The FEM sequel also derives the continuous optimality structure in the measure setting.
-There exists a unique adjoint $\bar\phi\in H^2(\Omega)\cap H^1_0(\Omega)$ solving
-\[
--\Delta \bar\phi + c_0 \bar\phi = \bar y - y_d\quad\text{in }\Omega,\qquad \bar\phi=0\quad\text{on }\Gamma,
-\]
-such that
-\begin{equation}\label{eq:sparsefem_opt_23_24}
-\alpha\|\bar u\|_{\mathcal M(\Omega)}+\int_\Omega \bar\phi\,d\bar u=0,
-\qquad
-\|\bar\phi\|_{C_0(\Omega)}
-\begin{cases}
-=\alpha,& \bar u\neq 0,\\
-\le \alpha,& \bar u=0.
-\end{cases}
-\end{equation}
-In terms of the Jordan decomposition $\bar u=\bar u^+-\bar u^-$, one deduces the saturation/support rule
-\begin{equation}\label{eq:sparsefem_support}
-\supp(\bar u^+)\subset\{x:\bar\phi(x)=-\alpha\},
-\qquad
-\supp(\bar u^-)\subset\{x:\bar\phi(x)=+\alpha\},
-\end{equation}
-hence $\bar u\equiv 0$ on $\{|\bar\phi|<\alpha\}$. 
-
-At the discrete level, the same geometry becomes a \emph{componentwise} complementarity condition. Introducing
-the discrete adjoint $\bar\phi_h\in Y_h$ and the nodal Dirac control $\bar u_h\in D_h$,
-the variational inequality defining the normal cone to the $C_0$-ball can be rewritten as
-\begin{equation}\label{eq:sparsefem_complementarity}
-\bar u_h + \max\!\bigl(0,\,-\bar u_h+\bar\phi_h-\alpha\bigr)
-+ \min\!\bigl(0,\,-\bar u_h+\bar\phi_h+\alpha\bigr)=0,
-\end{equation}
-understood componentwise in the coefficient vectors $(\lambda_j)$ and $(\phi_j)$. 
-This is again amenable to a locally superlinearly convergent semismooth Newton method in finite dimension. 
-
-%------------------------------------------------------------
-\subsection{Comparison with the predual strategy used in this report}
-We now juxtapose the above FEM philosophy with the predual philosophy we currently follow.
-
-\paragraph{(i) Where nonsmoothness is handled.}
-\begin{itemize}
-\item \textbf{Predual route (this report).} Nonsmoothness is shifted into a \emph{box constraint} on the Hilbert-space
-variable $p$, and the optimality system is solved as a semismooth equation
-\[
-F(p)=AA^*p+\max(0,c(p-\alpha))+\min(0,c(p+\alpha))+Az=0,
-\]
-based on the semismooth projector $P_\alpha(p)=\max(0,p-\alpha)+\min(0,p+\alpha)$ and its Newton derivative
-$\partial_N P_\alpha(p)h=h\,\chi_{\{|p|>\alpha\}}$. 
-\item \textbf{FEM route (SparseFEM).} Nonsmoothness stays in the measure norm, but discretization of the \emph{state}
-induces the canonical Dirac representative $\Lambda_h u$ and yields the componentwise complementarity equation
-\eqref{eq:sparsefem_complementarity} for the nodal coefficients. 
-\end{itemize}
-
-\paragraph{(ii) What ``sparsity'' means computationally.}
-\begin{itemize}
-\item \textbf{Predual.} Sparsity is encoded by the \emph{active set} $\{|p|=\alpha\}$ (or $\{|p|>\alpha\}$ at the
-regularized level), which enters directly in the Newton derivative via the characteristic function
-$\chi_{\{|p|>\alpha\}}$. 
-\item \textbf{SparseFEM.} Sparsity is encoded by the smallness of the \emph{saturation set} $\{|\bar\phi|=\alpha\}$ in the
-continuous optimality system \eqref{eq:sparsefem_opt_23_24}--\eqref{eq:sparsefem_support}, and, after discretization,
-by the fact that the discrete optimizer \emph{is literally a finite sum of Diracs at nodes}. 
-\end{itemize}
-
-\paragraph{(iii) Dictionary between variables.}
-In SparseFEM one has the subgradient characterization $-\bar\phi\in \alpha\,\partial\|\cdot\|_{\mathcal M}(\bar u)$,
-equivalently $\alpha\lambda=-\bar\phi$ for a subgradient $\lambda\in C_0(\Omega)$. 
-In the predual approach, the Hilbert-space variable $p$ is constrained by $|p|\le\alpha$ and the active set
-determines the structure of the optimal control. 
-Up to the sign convention, it is therefore natural to identify
-\[
-p \ \approx\ -\bar\phi,
-\qquad
-\{|p|=\alpha\}\ \approx\ \{|\bar\phi|=\alpha\},
-\]
-so that ``box activity'' in the predual formulation corresponds to ``adjoint saturation'' determining the
-support of the measure control in the primal formulation.
-
-\paragraph{(iv) What the FEM sequel adds conceptually.}
-The predual route motivates \emph{why} one should solve for $p$ in a Hilbert space rather than discretizing measures directly. 
-The FEM sequel complements this by showing that a straightforward nodal FEM approximation \emph{automatically}
-yields a canonical sparse surrogate of a measure control (Theorem~\ref{thm:Lambda_h}), thereby justifying the
-common practice of representing discrete measures by nodal Dirac sums—\emph{without losing the structural properties
-imposed by the measure norm}. 
 
 
 \section{Numerics}
@@ -1925,7 +1716,7 @@ In conclusion, this regularization scheme is not only an algorithmic trick to ma
 \label{sec:ssn}
 
 \paragraph{Starting point: the regularized optimality system.}
-Fix a Moreau--Yosida parameter $c>0$ and recall the regularized optimality system (cf.\ \cite[Sec.~3.2]{ClasonKunisch2011})
+Fix a Moreau--Yosida parameter $c>0$ and recall the regularized optimality system
 \begin{equation}\label{eq:opt_sys_reg}
 AA^\ast p_c + \lambda_c + Az = 0,
 \qquad
@@ -2140,11 +1931,311 @@ Algorithm~\ref{alg:ssn_paper} is the primal--dual active set strategy in disguis
 the update of $A_k^\pm$ is the ``active set'' step, and \eqref{eq:ssn_step_weak} is the corresponding linearized KKT system.
 The equivalence between both interpretations is classical; see \cite{HintermuellerItoKunisch2002}.
 
+\section{Experiments}\label{sec:experiments}
 
+\subsection{Experiment 1: Measure-valued control ($X=\mathcal{M}(\Omega)$)}\label{subsec:exp1_measures}
 
+We begin with the benchmark example from the numerical section of \cite{ClasonKunisch2009}, where the elliptic operator is taken as
+$A=-\Delta$ with homogeneous Dirichlet boundary conditions on the square domain
+$\Omega=[-1,1]^2$.
+The desired state is the discontinuous ``box'' target
+\[
+z_b(x,y)=\chi_{\{|x|<\tfrac12,\ |y|<\tfrac12\}},
+\]
+which is used in \cite{ClasonKunisch2009} to highlight the
+structural effect of the measure control cost $\alpha\|u\|_{\mathcal{M}(\Omega)}$
+(and, in particular, the sparsity effect described by the active-set characterization in Corollary~2.7 of \cite{ClasonKunisch2009}).
+
+Following the approach of \cite{ClasonKunisch2009}, we solve the (regularized) predual box-constrained problem and recover the optimal control via the primal--predual relation.
+Figure~\ref{fig:exp1_reproduction} shows the resulting target $z_b$, the computed optimal control $u^\ast$, and the corresponding state $y^\ast=A^{-1}u^\ast$.
+The qualitative structure is in very close agreement with the reference result in the paper (cf.\ the plots for $z_b$ in the numerical results section of \cite{ClasonKunisch2009}). The optimal control concentrates on a thin square ring-like set around the target region and exhibits pronounced localization, while the state attains an almost constant profile inside the square and transitions smoothly to (near) zero outside due to elliptic smoothing.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{result_basic_1.png}
+    \caption{Experiment 1 (measure control): target $z_b$ (left), computed optimal control $u^\ast$ (middle), and resulting state $y^\ast=A^{-1}u^\ast$ (right).
+    The obtained structure closely reproduces the qualitative behavior reported for the target $z_b$ in \cite{ClasonKunisch2009}.}
+    \label{fig:exp1_reproduction}
+\end{figure}
+
+This localization is precisely the expected sparsity effect of the $\mathcal{M}(\Omega)$-control cost: $u^\ast$ is (essentially) supported where the predual variable hits the box constraints $\{|p^\ast|=\alpha\}$, and vanishes where the constraint is inactive $\{|p^\ast|<\alpha\}$ \cite{ClasonKunisch2009}, as we can see in Figure ~\ref{fig:exp2_reproduction}
+
+\begin{figure}[th!]
+    \centering
+    \includegraphics[width=\linewidth]{result_basic_2.png}
+    \caption{Experiment 1 (measure control): Solution of predual (left), Active set (positive) $p > \alpha$ (middle-left), Active set (negative) $p < \alpha$ (middle-right), and combination $p < \|\alpha\|$ (right).}
+    \label{fig:exp2_reproduction}
+\end{figure}
+
+\subsection{Experiment 2: Semiconductor-inspired model with generation term}\label{subsec:exp2_semic}
+
+We now apply the measure--space optimal control framework to a simplified design problem for \emph{photodiodes}, i.e.\ semiconductor devices that convert incident light into an electrical signal.
+When light is absorbed in a semiconductor, it generates electron--hole pairs.
+These charge carriers are transported to the electrodes through a combination of diffusion and drift (advection) driven by the electric field.
+In many low-power and low-noise photodiode designs the internal electric field is deliberately kept weak, so that carrier transport is largely diffusion dominated.
+This motivates, as a first modeling step, a diffusion-based description of carrier collection.
+
+A photodiode is typically formed by bringing p-doped and n-doped semiconductor regions into contact, creating a p--n junction.
+One key performance quantity is the junction capacitance, which (in first approximation) scales with the junction interface area.
+Reducing capacitance is desirable because it improves bandwidth and reduces noise; however, a smaller junction area can also degrade carrier collection, since fewer generated carriers are swept or collected efficiently near the junction.
+This leads to an intrinsic trade-off between \emph{capacitance minimization} (small junction area) and \emph{collection efficiency}.
+
+We address this trade-off in an idealized geometry as follows.
+We consider a fixed semiconductor domain $\Omega$ (e.g.\ uniformly n-doped as a background material), and we seek an optimal placement of doped regions that act as ``collectors''.
+In our mathematical model, this placement is represented by a control variable $u$ that acts as a localized sink (or, more generally, as a measure-valued actuation) in the transport equation.
+The governing PDE additionally contains a prescribed \emph{generation term} $g$ (e.g.\ optical generation), which accounts for the creation of electron--hole pairs by illumination and enters as an inhomogeneous source term in the state equation.
+As discussed above, such a generation term can be incorporated into the framework by working with an inhomogeneous state equation of the form $A y = u + g$, i.e.\ the same control structure up to an affine shift of the state.
+
+This can be incorporated into our framework without changing the underlying analysis: one simply replaces the homogeneous equation $A y = u$ by an inhomogeneous one
+\begin{equation}\label{eq:state_with_generation}
+A y \;=\; u + g,
+\end{equation}
+where $g$ denotes the known generation profile (typically localized in a subregion of $\Omega$), and $A$ is the same elliptic/parabolic operator as before (e.g.\ a diffusion operator, possibly with additional lower-order terms).
+Equivalently, one may shift the state variable by introducing the particular solution $y_g := A^{-1}g$ and writing
+\[
+y \;=\; A^{-1}u + y_g .
+\]
+Hence the reduced objective becomes
+\[
+J(u) \;=\; \frac12\|A^{-1}u + y_g - z\|_{L^2(\Omega)}^2 \;+\; \alpha \|u\|_{\mathcal{M}(\Omega)}
+\;=\; \frac12\|A^{-1}u - (z-y_g)\|_{L^2(\Omega)}^2 \;+\; \alpha \|u\|_{\mathcal{M}(\Omega)} ,
+\]
+which is exactly the same structure as in the previous experiment, with a \emph{shifted target} $\tilde z := z - y_g$.
+In particular, the convexity, duality arguments, and the predual formulation carry over verbatim: the generation term influences the optimizer only through the affine shift $y_g$ (or, equivalently, through $\tilde z$), while the sparsity-promoting mechanism induced by the $\mathcal{M}(\Omega)$-term remains unchanged.
+
+We solved the problem for diffusion coefficients equally spaced in the interval $[0.1,0.6]$. The corresponding optimal controls are shown in Figure~\ref{fig:exp3_reproduction}. A clear trend emerges: the optimal sink geometry adapts systematically to the diffusion strength, i.e., to how rapidly carriers spread across the domain. For small diffusivity, the optimizer favors highly localized, almost point-like sink patterns. This matches the intuition that when particles do not spread far, effective collection is achieved by concentrating the control at a few strategically placed locations. In contrast, for larger diffusivity the optimal control becomes increasingly distributed, forming an extended “net” that intercepts carriers over a wider area before they can reach (and be lost through) the boundary.
+
+\begin{figure}[th!]
+    \centering
+    \includegraphics[width=\linewidth]{result_semic_3.png}
+    \caption{Experiment 2 : Solution obtained for different diffusion coefficients for a constant illumination area (top left).}
+    \label{fig:exp3_reproduction}
+\end{figure}
+
+\section{Conclusion}
+
+Elliptic optimal control with measure-valued controls provides a natural framework for modeling \emph{localized actuation} and for enforcing \emph{sparsity} in PDE-constrained optimization. The main difficulty is that the control variable lives in the nonreflexive Banach space $\mathcal{M}(\Omega)$ and the objective contains the nonsmooth total variation term $\alpha\|u\|_{\mathcal{M}(\Omega)}$. As a consequence, neither standard $L^2$-control techniques nor classical smooth optimality systems apply directly. On the PDE side, measure right-hand sides also require a careful notion of solution, since a general measure does not belong to $H^{-1}(\Omega)$ and the usual $H_0^1$-weak formulation is not available.
+
+The first part of the report resolves these issues analytically by working with the \emph{very weak} Dirichlet formulation and exploiting elliptic regularization. This yields a well-defined control-to-state mapping $S:\mathcal{M}(\Omega)\to L^2(\Omega)$ together with compactness properties that make the direct method applicable. In particular, boundedness in $\mathcal{M}(\Omega)$ gives weak-$\ast$ compactness (Banach--Alaoglu), while the associated states are compact in $L^2(\Omega)$ (Rellich), which allows one to prove existence (and under standard assumptions, uniqueness) of an optimal control. These mapping and compactness mechanisms are the core reason why the tracking term and the measure penalty can be combined into a well-posed optimization problem.
+
+From a computational perspective, the key step is the \emph{predual reformulation} obtained by Fenchel duality: the nonsmooth measure norm is converted into the box constraint $\|p\|_\infty\le \alpha$ on a smooth variable $p\in H^2(\Omega)\cap H_0^1(\Omega)\hookrightarrow C_0(\Omega)$. This Hilbert-space formulation leads to a clear KKT system and, crucially, to a structural sparsity principle: the optimal measure $u^\ast$ is identified with (minus) the KKT multiplier and can only concentrate on the active set $\{|p^\ast|=\alpha\}$. To solve the resulting constrained problem efficiently, we then employ Moreau--Yosida regularization of the box constraint and a semismooth Newton / primal-dual active set strategy, supported by a convergence theorem showing that the regularized solutions converge to the original box-constrained solution as the regularization parameter tends to infinity.
+
+Finally, we demonstrated how this framework can be applied to a semiconductor-inspired design problem for photodiodes in a diffusion-dominated regime. In this model, optical illumination enters as a prescribed generation term $g$, leading to an inhomogeneous state equation $Ay=u+g$ that fits into the same theory after an affine shift of the target. Numerically, the optimal sink patterns exhibit a physically meaningful dependence on the diffusion coefficient: for weak diffusion the optimal control concentrates into highly localized sink regions, while for stronger diffusion it becomes more distributed and forms an extended collection structure. This illustrates how measure-based sparsity provides an effective mathematical proxy for the design trade-off between localized collection (small active region, low “cost”) and global carrier removal (robust collection under strong spreading), thereby connecting the abstract optimal control theory to interpretable device-level behavior.
 
 
 \bibliographystyle{plain} % numeric
 \bibliography{refs}
+
+\appendix
+
+\section{An alternative route: variational discretization}
+\label{sec:comparison_sparsefem}
+
+In the previous sections of this report, our guiding principle was to \emph{avoid} a direct discretization of
+controls in $\mathcal M(\Omega)$ by passing to a \emph{predual} formulation. In that approach, the predual
+variable $p$ lives in a Hilbert space and the non-smooth measure norm reappears as a \emph{box constraint}
+on $p$; the resulting optimality system can then be treated efficiently by a semismooth Newton method
+based on active sets. This is precisely the philosophy advocated in the duality-based paper
+of Clason--Kunisch. 
+
+It is, however, not the only viable approach. A conceptually different (and, at first glance, more
+``direct'') route is developed in the FEM sequel \emph{Approximation of elliptic control problems in
+measure spaces with sparse solutions} (Casas--Clason--Kunisch). We will call it SparseFEM.
+The key message of that paper is that one can discretize only the \emph{state equation} by nodal finite
+elements while keeping $u\in\mathcal M(\Omega)$ at the continuous level (``variational discretization''),
+and nevertheless obtain an \emph{intrinsically sparse} discrete control:
+the discrete optimizer can be chosen (uniquely) as a \emph{finite linear combination of Dirac measures at
+mesh nodes}. 
+
+The goal of this section is to (i) explain the main idea of this FEM approach, (ii) state its central theorem,
+and (iii) compare it with the predual strategy used in this report.
+
+%------------------------------------------------------------
+\subsection{Main idea: discretize the state, and sparsity becomes nodal}
+We recall the distributed measure-control model problem considered in the FEM sequel:
+\[
+(P)\qquad \min_{u\in\mathcal M(\Omega)}\;
+J(u)=\frac12\|y-y_d\|_{L^2(\Omega)}^2 + \alpha \|u\|_{\mathcal M(\Omega)},
+\quad\text{where }y\text{ solves }-\Delta y + c_0 y = u\text{ in }\Omega,\ y=0\text{ on }\Gamma .
+\]
+
+The approximation framework fixes a family of triangulations $\{\mathcal T_h\}_{h>0}$ and the nodal
+$P_1$ finite element space
+\[
+Y_h := \{y_h\in C_0(\Omega): y_h|_{T}\in \mathbb P_1\ \forall T\in\mathcal T_h\}.
+\]
+The discrete state associated with a \emph{measure} $u\in\mathcal M(\Omega)$ is then defined as the unique
+$y_h(u)\in Y_h$ satisfying
+\begin{equation}\label{eq:sparsefem_state_discrete}
+a(y_h,z_h)=\int_{\Omega_h} z_h\,du\qquad\forall z_h\in Y_h,
+\end{equation}
+where $a(\cdot,\cdot)$ is the bilinear form of $-\Delta + c_0$. 
+This yields the discrete optimization problem
+\[
+(P_h)\qquad \min_{u\in\mathcal M(\Omega)}\;
+J_h(u)=\frac12\|y_h(u)-y_d\|_{L^2(\Omega_h)}^2 + \alpha \|u\|_{\mathcal M(\Omega)}.
+\]
+
+\medskip
+\noindent
+\textbf{The conceptual surprise.}
+At this point the control space has \emph{not} been discretized. Nonetheless, the FEM sequel proves that
+the discrete state equation \eqref{eq:sparsefem_state_discrete} only ``sees'' $u$ through its action on the
+nodal basis. This induces a canonical operator that replaces an arbitrary measure by a Dirac combination
+at mesh nodes \emph{without changing the discrete state}. This is the mechanism that turns sparsity into
+a concrete, finite-dimensional structure.
+
+%------------------------------------------------------------
+\subsection{A canonical Dirac projection $\Lambda_h$}
+Let $\{x_j\}_{j=1}^{N(h)}$ denote the interior nodes of $\mathcal T_h$ and $\{e_j\}_{j=1}^{N(h)}$ the nodal basis
+of $Y_h$. Define the \emph{nodal Dirac space}
+\[
+D_h := \left\{u_h\in\mathcal M(\Omega): u_h=\sum_{j=1}^{N(h)}\lambda_j\,\delta_{x_j}\right\},
+\]
+and the operators $\Pi_h:C_0(\Omega)\to Y_h$ and $\Lambda_h:\mathcal M(\Omega)\to D_h$ by
+\[
+\Pi_h z := \sum_{j=1}^{N(h)} z(x_j)\,e_j,
+\qquad
+\Lambda_h u := \sum_{j=1}^{N(h)} \langle u,e_j\rangle\,\delta_{x_j}.
+\]
+
+\begin{theorem}[Canonical nodal Dirac replacement (Casas--Clason--Kunisch)]
+\label{thm:Lambda_h}
+The following properties hold:
+\begin{enumerate}
+\item For every $u\in\mathcal M(\Omega)$, $z\in C_0(\Omega)$ and $z_h\in Y_h$,
+\begin{align}
+\label{eq:Lambda_pairing_FE}
+\langle u,z_h\rangle &= \langle \Lambda_h u, z_h\rangle,\\
+\label{eq:Lambda_pairing_interp}
+\langle u,\Pi_h z\rangle &= \langle \Lambda_h u, z\rangle .
+\end{align}
+\item The mapping is norm-decreasing and consistent:
+\begin{equation}\label{eq:Lambda_norm_and_convergence}
+\|\Lambda_h u\|_{\mathcal M(\Omega)}\le \|u\|_{\mathcal M(\Omega)},\qquad
+\Lambda_h u \stackrel{*}{\rightharpoonup} u\ \text{ in }\mathcal M(\Omega),\qquad
+\|\Lambda_h u\|_{\mathcal M(\Omega)}\to \|u\|_{\mathcal M(\Omega)}.
+\end{equation}
+\item There exists $C>0$ such that for $1<p<\frac{n}{n-1}$,
+\[
+\|u-\Lambda_h u\|_{W^{-1,p}(\Omega)} \le C\,h^{\,1-n/p'}\|u\|_{\mathcal M(\Omega)},
+\]
+(with an analogous bound in $(W^{1,\infty}_0(\Omega))^*$).
+\item Let $y_h$ and $\tilde y_h$ be the solutions of the discrete state equation
+\eqref{eq:sparsefem_state_discrete} corresponding to $u$ and $\Lambda_h u$, respectively.
+Then
+\[
+y_h=\tilde y_h .
+\]
+\end{enumerate}
+\end{theorem}
+
+
+\medskip
+\noindent
+\textbf{Interpretation.}
+Item~4 is the pivotal point: \emph{once the PDE is discretized in $Y_h$, replacing $u$ by the nodal Dirac
+combination $\Lambda_h u$ leaves the discrete state unchanged.} Hence, for the discrete problem,
+``Dirac-at-nodes'' controls are not a heuristic—they are the \emph{canonical representatives} of equivalence
+classes of measures that produce the same discrete state.
+
+A direct consequence is that although $(P_h)$ may have multiple minimizers in $\mathcal M(\Omega)$, there is
+a unique minimizer in $D_h$, and every minimizer collapses to it under $\Lambda_h$:
+\begin{theorem}[Uniqueness in $D_h$]
+\label{thm:unique_in_Dh}
+Problem $(P_h)$ admits at least one solution. Among them there exists a unique one $\bar u_h\in D_h$.
+Moreover, any other solution $\tilde u_h\in\mathcal M(\Omega)$ satisfies $\Lambda_h\tilde u_h=\bar u_h$.
+\end{theorem}
+
+
+Thus, the discrete control can be written uniquely as
+\[
+\bar u_h=\sum_{j=1}^{N(h)}\bar\lambda_j\,\delta_{x_j},
+\]
+and computation reduces to the finite vector $(\bar\lambda_1,\dots,\bar\lambda_{N(h)})$. 
+
+%------------------------------------------------------------
+\subsection{Optimality structure and sparsity}
+The FEM sequel also derives the continuous optimality structure in the measure setting.
+There exists a unique adjoint $\bar\phi\in H^2(\Omega)\cap H^1_0(\Omega)$ solving
+\[
+-\Delta \bar\phi + c_0 \bar\phi = \bar y - y_d\quad\text{in }\Omega,\qquad \bar\phi=0\quad\text{on }\Gamma,
+\]
+such that
+\begin{equation}\label{eq:sparsefem_opt_23_24}
+\alpha\|\bar u\|_{\mathcal M(\Omega)}+\int_\Omega \bar\phi\,d\bar u=0,
+\qquad
+\|\bar\phi\|_{C_0(\Omega)}
+\begin{cases}
+=\alpha,& \bar u\neq 0,\\
+\le \alpha,& \bar u=0.
+\end{cases}
+\end{equation}
+In terms of the Jordan decomposition $\bar u=\bar u^+-\bar u^-$, one deduces the saturation/support rule
+\begin{equation}\label{eq:sparsefem_support}
+\supp(\bar u^+)\subset\{x:\bar\phi(x)=-\alpha\},
+\qquad
+\supp(\bar u^-)\subset\{x:\bar\phi(x)=+\alpha\},
+\end{equation}
+hence $\bar u\equiv 0$ on $\{|\bar\phi|<\alpha\}$. 
+
+At the discrete level, the same geometry becomes a \emph{componentwise} complementarity condition. Introducing
+the discrete adjoint $\bar\phi_h\in Y_h$ and the nodal Dirac control $\bar u_h\in D_h$,
+the variational inequality defining the normal cone to the $C_0$-ball can be rewritten as
+\begin{equation}\label{eq:sparsefem_complementarity}
+\bar u_h + \max\!\bigl(0,\,-\bar u_h+\bar\phi_h-\alpha\bigr)
++ \min\!\bigl(0,\,-\bar u_h+\bar\phi_h+\alpha\bigr)=0,
+\end{equation}
+understood componentwise in the coefficient vectors $(\lambda_j)$ and $(\phi_j)$. 
+This is again amenable to a locally superlinearly convergent semismooth Newton method in finite dimension. 
+
+%------------------------------------------------------------
+\subsection{Comparison with the predual strategy used in this report}
+We now juxtapose the above FEM philosophy with the predual philosophy we currently follow.
+
+\paragraph{(i) Where nonsmoothness is handled.}
+\begin{itemize}
+\item \textbf{Predual route (this report).} Nonsmoothness is shifted into a \emph{box constraint} on the Hilbert-space
+variable $p$, and the optimality system is solved as a semismooth equation
+\[
+F(p)=AA^*p+\max(0,c(p-\alpha))+\min(0,c(p+\alpha))+Az=0,
+\]
+based on the semismooth projector $P_\alpha(p)=\max(0,p-\alpha)+\min(0,p+\alpha)$ and its Newton derivative
+$\partial_N P_\alpha(p)h=h\,\chi_{\{|p|>\alpha\}}$. 
+\item \textbf{FEM route (SparseFEM).} Nonsmoothness stays in the measure norm, but discretization of the \emph{state}
+induces the canonical Dirac representative $\Lambda_h u$ and yields the componentwise complementarity equation
+\eqref{eq:sparsefem_complementarity} for the nodal coefficients. 
+\end{itemize}
+
+\paragraph{(ii) What ``sparsity'' means computationally.}
+\begin{itemize}
+\item \textbf{Predual.} Sparsity is encoded by the \emph{active set} $\{|p|=\alpha\}$ (or $\{|p|>\alpha\}$ at the
+regularized level), which enters directly in the Newton derivative via the characteristic function
+$\chi_{\{|p|>\alpha\}}$. 
+\item \textbf{SparseFEM.} Sparsity is encoded by the smallness of the \emph{saturation set} $\{|\bar\phi|=\alpha\}$ in the
+continuous optimality system \eqref{eq:sparsefem_opt_23_24}--\eqref{eq:sparsefem_support}, and, after discretization,
+by the fact that the discrete optimizer \emph{is literally a finite sum of Diracs at nodes}. 
+\end{itemize}
+
+\paragraph{(iii) Dictionary between variables.}
+In SparseFEM one has the subgradient characterization $-\bar\phi\in \alpha\,\partial\|\cdot\|_{\mathcal M}(\bar u)$,
+equivalently $\alpha\lambda=-\bar\phi$ for a subgradient $\lambda\in C_0(\Omega)$. 
+In the predual approach, the Hilbert-space variable $p$ is constrained by $|p|\le\alpha$ and the active set
+determines the structure of the optimal control. 
+Up to the sign convention, it is therefore natural to identify
+\[
+p \ \approx\ -\bar\phi,
+\qquad
+\{|p|=\alpha\}\ \approx\ \{|\bar\phi|=\alpha\},
+\]
+so that ``box activity'' in the predual formulation corresponds to ``adjoint saturation'' determining the
+support of the measure control in the primal formulation.
+
+\paragraph{(iv) What the FEM sequel adds conceptually.}
+The predual route motivates \emph{why} one should solve for $p$ in a Hilbert space rather than discretizing measures directly. 
+The FEM sequel complements this by showing that a straightforward nodal FEM approximation \emph{automatically}
+yields a canonical sparse surrogate of a measure control (Theorem~\ref{thm:Lambda_h}), thereby justifying the
+common practice of representing discrete measures by nodal Dirac sums—\emph{without losing the structural properties
+imposed by the measure norm}. 
 
 \end{document}

@@ -8,6 +8,38 @@
 \setbeamertemplate{navigation symbols}{}
 
 % --------------------
+% Make Madrid look slimmer
+% --------------------
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[default] % no rounded/shadow boxes
+
+% Remove colored block backgrounds (major visual simplification)
+\setbeamercolor{block title}{fg=black,bg=white}
+\setbeamercolor{block body}{fg=black,bg=white}
+\setbeamercolor{block title alerted}{fg=black,bg=white}
+\setbeamercolor{block body alerted}{fg=black,bg=white}
+
+% Remove extra vertical space in blocks
+\setlength{\abovedisplayskip}{6pt}
+\setlength{\belowdisplayskip}{6pt}
+\setlength{\abovedisplayshortskip}{4pt}
+\setlength{\belowdisplayshortskip}{4pt}
+
+% Slightly denser lists (but still readable)
+\setlength{\itemsep}{3pt}
+\setlength{\parskip}{2pt}
+\setlength{\parsep}{0pt}
+
+% Less distracting title bar
+\setbeamercolor{frametitle}{fg=black,bg=white}
+\setbeamertemplate{frametitle}{
+  \vspace{0.2em}
+  \insertframetitle
+  \par\vspace{0.2em}\hrule
+}
+
+
+% --------------------
 % Packages
 % --------------------
 \usepackage{amsmath, amssymb, amsfonts}
@@ -60,26 +92,17 @@
 % ============================================================
 % MOTIVATION
 % ============================================================
-\begin{frame}{Motivation | why measure-valued controls?}
+\begin{frame}{Motivation: why measure-valued controls?}
 
-\begin{block}{Localized actuation in the real world}
-Many control mechanisms are \emph{intrinsically concentrated} in space, e.g.
+Desired properties 
 \begin{itemize}
-  \item \textbf{Thermal control:} laser heating on a tiny spot, or micro-heaters on a chip (point-like heat sources).
-  \item \textbf{Semiconductor devices:} carrier injection/extraction at small contacts (point-electrodes). 
-  \item \textbf{Structural mechanics:} concentrated loads or actuators in beams/plates.
+  \item \textbf{Localized actuation:} heating spots, micro-heaters, point electrodes, concentrated loads.
+  \item \textbf{Natural model:} point sources $\approx$ Dirac measures $\Rightarrow u\in\mathcal M(\Omega)$.
+  \item \textbf{Sparsity:} $L^1$-type penalties promote concentrated/active-set solutions.
 \end{itemize}
-\end{block}
 
-\begin{block}{Sparsity promotion}
-Replacing a quadratic control cost by an $L^1$-type cost promotes sparse actuation.
-In PDE settings, the measure space $\M(\Om)$ is the natural model.
-\end{block}
-
-\begin{alertblock}{Main challenge}
-The problem is nonsmooth \emph{and} posed in the nonreflexive space $\M(\Om)$.
-\end{alertblock}
-
+\medskip
+\textbf{Main challenge:} nonsmooth cost in a nonreflexive space.
 \end{frame}
 
 % ============================================================
@@ -162,28 +185,58 @@ J(u):=\frac12 \norm{Su-z}_{L^2(\Om)}^2 + \alpha \norm{u}_{\M(\Om)}.
 % ============================================================
 % EXISTENCE / UNIQUENESS
 % ============================================================
-\begin{frame}{Optimization problem | Existence and uniqueness (direct method)}
-\begin{block}{Compactness mechanism}
-\begin{itemize}
-  \item Minimizing sequence $(u_n)$ bounded in $\M(\Om)$
-  \item Banach--Alaoglu: $u_n \stackrel{\ast}{\rightharpoonup} u^\ast$ in $\sigma(\M(\Om), C_0(\Om))$
-  \item States $y_n=Su_n$ bounded in $W^{1,p}_0(\Om)$
-  \item Rellich: $y_n \to y^\ast$ strongly in $L^2(\Om)$
-\end{itemize}
-\end{block}
+%\begin{frame}{Optimization problem | Existence and uniqueness (direct method)}
+%\begin{block}{Compactness mechanism}
+%\begin{itemize}
+%  \item Minimizing sequence $(u_n)$ bounded in $\M(\Om)$
+%  \item Banach--Alaoglu: $u_n \stackrel{\ast}{\rightharpoonup} u^\ast$ in $\sigma(\M(\Om), C_0(\Om))$
+%  \item States $y_n=Su_n$ bounded in $W^{1,p}_0(\Om)$
+%  \item Rellich: $y_n \to y^\ast$ strongly in $L^2(\Om)$
+%\end{itemize}
+%\end{block}
 
-\begin{block}{Lower semicontinuity}
+%\begin{block}{Lower semicontinuity}
+%\[
+%\norm{u^\ast}_\M \le \liminf_{n\to\infty}\norm{u_n}_\M,
+%\qquad
+%\norm{Su_n - z}_{L^2}^2 \to \norm{Su^\ast-z}_{L^2}^2.
+%\] So $u^\ast$ is optimal.
+%\end{block}
+
+%\textbf{Uniqueness:}
+%Strict convexity of the $L^2$ norm (and injectivity of $S$) gives uniqueness of the minimizer.
+
+%\end{frame}
+
+\begin{frame}{Existence and uniqueness (direct method)}
+\textbf{Primal problem:}\;
+$\displaystyle
+\min_{u\in\M(\Omega)}\;
+\frac12\|Su-z\|_{L^2(\Omega)}^2+\alpha\|u\|_{\M(\Omega)}.
+$
+
+\medskip
+\textbf{Existence.}
+Let $(u_n)$ be a minimizing sequence. Then
 \[
-\norm{u^\ast}_\M \le \liminf_{n\to\infty}\norm{u_n}_\M,
-\qquad
-\norm{Su_n - z}_{L^2}^2 \to \norm{Su^\ast-z}_{L^2}^2.
-\] So $u^\ast$ is optimal.
-\end{block}
+\|u_n\|_{\M}\le C \quad\Rightarrow\quad
+u_n \stackrel{*}{\rightharpoonup} u^\ast \text{ in }\M(\Omega)
+\quad\text{(Banach--Alaoglu)}.
+\]
+Moreover, $y_n:=Su_n$ is bounded in $W^{1,p}_0(\Omega)$, hence
+\[
+Su_n \to Su^\ast \text{ in }L^2(\Omega)
+\quad\text{(Rellich)}.
+\]
+Lower semicontinuity of $\|\cdot\|_{\M}$ gives
+$\|u^\ast\|_{\M}\le\liminf_n\|u_n\|_{\M}$, so $u^\ast$ is optimal.
 
-\begin{alertblock}{Uniqueness}
-Strict convexity of the $L^2$ norm (and injectivity of $S$) gives uniqueness of the minimizer.
-\end{alertblock}
+\medskip
+\textbf{Uniqueness.}
+The term $\frac12\|Su-z\|_{L^2}^2$ is strictly convex in $Su$.
+If $S$ is injective, then $u^\ast$ is unique.
 \end{frame}
+
 
 % ============================================================
 % WHY PRE-DUAL?
@@ -211,54 +264,35 @@ Measure norm $\Rightarrow$ \emph{box constraint} on a smooth variable.
 \end{frame}
 
 % ============================================================
-% PRE-DUAL DERIVATION 1/2
+% PRE-DUAL DERIVATION 
 % ============================================================
-\begin{frame}{Optimization problem | Deriving the predual (Step 1)}
-\begin{block}{Step 1: Reduced primal formulation}
+\begin{frame}{Predual reformulation (Fenchel duality)}
+\small
 Let $S:\mathcal M(\Omega)\to L^2(\Omega)$ denote the control-to-state map $Su=y(u)$.
 The primal problem reads
 \[
-\min_{u\in\mathcal M(\Omega)}
+\inf_{u\in\mathcal M(\Omega)}
 \; \frac12\|Su-z\|_{L^2(\Omega)}^2+\alpha\|u\|_{\mathcal M(\Omega)}.
 \]
-\end{block}
-\end{frame}
 
-
-% ============================================================
-% PRE-DUAL DERIVATION 2/2
-% ============================================================
-\begin{frame}{Optimization problem | Deriving the predual (Steps 2--5)}
-\vspace{-1mm}
-
-\begin{block}{Step 2--4: Idea (Fenchel duality)}
 \begin{itemize}
-  \item \textbf{Step 2:} Dualize the quadratic tracking term
-  \[
-  \frac12\|Su-z\|_{L^2}^2
-  \;=\;
-  \sup_{w\in L^2}\Bigl\{\langle Su-z,w\rangle-\frac12\|w\|_{L^2}^2\Bigr\}.
-  \]
-  \item \textbf{Step 3:} Move $S$ to the adjoint side: $\;\langle Su,w\rangle=\langle u,S^\ast w\rangle$,
-  and set $p:=S^\ast w\in C_0(\Omega)$.
-  \item \textbf{Step 4:} Eliminate $u$ using
-  \[
+  \item Tracking term dualization: $\frac12\|Su-z\|_{L^2}^2
+  =\sup_{w\in L^2}\Bigl\{\langle Su-z,w\rangle-\frac12\|w\|_{L^2}^2\Bigr\}.$
+  \item Adjoint move: $\langle Su,w\rangle=\langle u,S^\ast w\rangle$, set $p:=S^\ast w\in C_0(\Omega)$.
+  \item Eliminating $u$: $
   \sup_{u\in\mathcal M(\Omega)}\{\langle u,p\rangle-\alpha\|u\|_{\mathcal M}\}=0
-  \ \Longleftrightarrow\ 
-  \|p\|_\infty\le \alpha.
-  \]
+  \iff \|p\|_\infty\le \alpha. $
 \end{itemize}
-\end{block}
 
-\begin{alertblock}{Step 5: Predual problem}
-\[
-\min_{p\in H^2(\Omega)\cap H_0^1(\Omega)}
-\Bigl[\frac12\|A^\ast p+z\|_{L^2(\Omega)}^2-\frac12\|z\|_{L^2(\Omega)}^2\Bigr]
-\quad\text{s.t.}\quad
-\|p\|_\infty\le \alpha.
-\]
-\end{alertblock}
+\medskip
+\textbf{Predual:}\;
+$
+\inf\limits_{p\in H^2\cap H_0^1}
+\Bigl[\frac12\|A^\ast p+z\|_{L^2}^2-\frac12\|z\|_{L^2}^2\Bigr]
+\;\text{s.t.}\;\|p\|_\infty\le\alpha.
+$
 \end{frame}
+
 
 % ============================================================
 % PRE-DUAL PROBLEM
@@ -285,80 +319,118 @@ All nonsmoothness is now in a \emph{simple} pointwise constraint.
 % ============================================================
 % KKT DERIVATION 
 % ============================================================
-\begin{frame}{Optimality conditions | KKT conditions for the predual problem }
-\vspace{-1mm}
+%\begin{frame}{Optimality conditions | KKT conditions for the predual problem }
+%\vspace{-1mm}
 
-\begin{block}{Step 1: Compute the derivative of $F$}
+%\begin{block}{Step 1: Compute the derivative of $F$}
+%\[
+%\nabla F(p)=AA^\ast p + Az \in H_0^2(\Omega)^\ast.\]
+%\end{block}
+
+%\begin{block}{Step 2: KKT condition via subdifferentials}
+%Since $F$ is convex and Fr\'echet differentiable and $K$ is closed convex,
+%\[
+%0\in \partial(F+I_K)(p^\ast)=\nabla F(p^\ast)+\partial I_K(p^\ast).
+%\iff \exists\,\lambda^\ast\in N_K(p^\ast)\ \textrm{ s.t. }\nabla F(p^\ast)+\lambda^\ast=0. \]
+
+%\end{block}
+
+%\begin{alertblock}{Step 3: KKT system (stationarity + variational inequality)}
+%Find $(p^\ast,\lambda^\ast)\in H_0^2(\Omega)\times H_0^2(\Omega)^\ast$ such that
+%\[
+%AA^\ast p^\ast + Az + \lambda^\ast = 0 \quad\text{in } H_0^2(\Omega)^\ast,
+%\]
+%\[
+%\langle \lambda^\ast,\,p-p^\ast\rangle_{H_0^2{}^\ast,H_0^2}\le 0
+%\quad \forall\,p\in H_0^2(\Omega)\ \text{with }\|p\|_{C_0}\le \alpha. \]
+%\end{alertblock}
+
+%\end{frame}
+
+\begin{frame}{KKT conditions for the predual problem}
+\small
+\textbf{Predual:}\;
+$\displaystyle
+\min_{p\in H^2\cap H_0^1} F(p)
+\ \text{s.t. }\|p\|_\infty\le\alpha,
+$
+where
 \[
-\nabla F(p)=AA^\ast p + Az \in H_0^2(\Omega)^\ast.\]
-\end{block}
+F(p)=\tfrac12\|A^\ast p+z\|_{L^2}^2-\tfrac12\|z\|_{L^2}^2.
+\]
 
-\begin{block}{Step 2: KKT condition via subdifferentials}
-Since $F$ is convex and Fr\'echet differentiable and $K$ is closed convex,
+\medskip
+\textbf{Gradient:}\quad
+$\nabla F(p)=AA^\ast p + Az \in (H_0^2(\Omega))^\ast$.
+
+\medskip
+Let $K:=\{p\in C_0(\Omega):\|p\|_\infty\le\alpha\}$.
+Optimality is
 \[
 0\in \partial(F+I_K)(p^\ast)=\nabla F(p^\ast)+\partial I_K(p^\ast).
-\iff \exists\,\lambda^\ast\in N_K(p^\ast)\ \nabla F(p^\ast)+\lambda^\ast=0. \]
-
-\end{block}
-
-\begin{alertblock}{Step 3: KKT system (stationarity + variational inequality)}
-Find $(p^\ast,\lambda^\ast)\in H_0^2(\Omega)\times H_0^2(\Omega)^\ast$ such that
-\[
-AA^\ast p^\ast + Az + \lambda^\ast = 0 \quad\text{in } H_0^2(\Omega)^\ast,
+\iff \exists\,\lambda^\ast\in N_K(p^\ast)\ \textrm{ s.t. }\nabla F(p^\ast)+\lambda^\ast=0.
 \]
-\[
-\langle \lambda^\ast,\,p-p^\ast\rangle_{H_0^2{}^\ast,H_0^2}\le 0
-\quad \forall\,p\in H_0^2(\Omega)\ \text{with }\|p\|_{C_0}\le \alpha. \]
-\end{alertblock}
 
+\medskip
+\textbf{KKT system:} find $(p^\ast,\lambda^\ast)$ with
+\[
+AA^\ast p^\ast + Az + \lambda^\ast = 0,
+\qquad
+\lambda^\ast\in N_K(p^\ast).
+\]
+
+\medskip
+Equivalently to $\lambda^\ast\in N_K(p^\ast)$ (variational inequality):
+\[
+\langle \lambda^\ast,\,p-p^\ast\rangle \le 0
+\qquad \forall\,p\in K.
+\]
 \end{frame}
+
 
 
 % ============================================================
 % PRIMAL IDENTIFICATION + SPARSITY THEOREM
 % ============================================================
 \begin{frame}{Optimality conditions | Primal identification and sparsity }
-\vspace{-1mm}
-
-\begin{block}{Identify the primal solution $u^\ast$}
-From the saddle-point / KKT system one obtains
+\small
+From KKT: $\lambda^\ast\in N_K(p^\ast)\subset \M(\Omega)$.
+Define the primal optimizer by
 \[
-\lambda^\ast \in \partial I_K(p^\ast)=N_K(p^\ast)
-\qquad\Longleftrightarrow\qquad
-u^\ast := -\lambda^\ast \in \mathcal M(\Omega)
+u^\ast := -\lambda^\ast \in \M(\Omega).
 \]
-\end{block}
 
-\begin{block}{Sparsity / sign property}
-For every test function $\psi\in C_c(\Omega)$ with $\psi\ge 0$:
+\medskip
+\textbf{Support / sparsity (inactive set):}
+for $\psi\in C_c(\Omega)$, $\psi\ge0$,
 \[
-\langle u^\ast,\psi\rangle = 0
-\quad \text{if }\supp(\psi)\subset\{|p^\ast|<\alpha\},
+\supp(\psi)\subset\{|p^\ast|<\alpha\}
+\quad\Longrightarrow\quad
+\langle u^\ast,\psi\rangle=0.
 \]
+
+\medskip
+\textbf{Sign on the active set:}
 \[
-\langle u^\ast,\psi\rangle \ge 0
-\quad \text{if }\supp(\psi)\subset\{p^\ast=\alpha\},
+\supp(\psi)\subset\{p^\ast=\alpha\}\Rightarrow \langle u^\ast,\psi\rangle\ge0,
 \qquad
-\langle u^\ast,\psi\rangle \le 0
-\quad \text{if }\supp(\psi)\subset\{p^\ast=-\alpha\}.
+\supp(\psi)\subset\{p^\ast=-\alpha\}\Rightarrow \langle u^\ast,\psi\rangle\le0.
 \]
-\end{block}
 
+\medskip
+\textbf{Interpretation:}
+$u^\ast$ concentrates on $\{|p^\ast|=\alpha\}$ (active set).
 \end{frame}
+
 
 % ============================================================
 % NUMERICS: REGULARIZATION
 % ============================================================
 \begin{frame}{Numerics and regularization | Moreau--Yosida regularization of the box}
-\begin{block}{Problem}
-The constraint $\norm{p}_\infty\le \alpha$ is nonsmooth (active-set structure).
-\end{block}
+\textbf{Problem:}
+The constraint $\norm{p}_\infty\le \alpha$ is nonsmooth (active-set structure). \newline
 
-\begin{block}{Effect}
-Allows Newton-type methods
-\end{block}
-
-\begin{block}{Regularized predual problem $(P^\ast_{M,c})$}
+\textbf{Regularized predual problem $(P^\ast_{M,c})$:} \\
 For $c>0$, let $p_c\in H_0^2(\Omega)$ be the unique minimizer of
 \[
 \frac12\|A^\ast p+z\|_{L^2(\Omega)}^2-\frac12\|z\|_{L^2(\Omega)}^2
@@ -370,43 +442,51 @@ and define
 \lambda_c:=\max(0,c(p_c-\alpha))+\min(0,c(p_c+\alpha)).
 \]
 Then $(p_c,\lambda_c)$ solves $AA^\ast p_c+Az+\lambda_c=0$.
-\end{block}
+
 
 \end{frame}
 
 % ============================================================
 % CONVERGENCE OF THE REGULARIZATION 
 % ============================================================
-\begin{frame}{Numerics and regularization | Convergence of the Moreau--Yosida}
+\begin{frame}{Convergence of Moreau--Yosida regularization}
 \small
-\vspace{-1mm}
-
-
-
-\begin{alertblock}{Theorem (Convergence as $c\to\infty$)}
-Let $(p^\ast,\lambda^\ast)$ be the unique KKT solution of the unregularized box-constrained problem.
-Then, as $c\to\infty$,
+\textbf{Theorem.}
+Let $(p^\ast,\lambda^\ast)$ solve the unregularized KKT system. Then as $c\to\infty$,
 \[
-p_c \to p^\ast \ \text{strongly in } H_0^2(\Omega),
+p_c \to p^\ast \ \text{in } H_0^2(\Omega),
 \qquad
-\lambda_c \rightharpoonup \lambda^\ast \ \text{weakly in } H_0^2(\Omega)^\ast.
+\lambda_c \rightharpoonup \lambda^\ast \ \text{in } (H_0^2(\Omega))^\ast.
 \]
-\end{alertblock}
 
-\begin{block}{Proof idea }
+\medskip
+\textbf{Proof idea .}
 \begin{enumerate}
-\item (Key inequality) From the pointwise definition: $\;\langle \lambda_c,p_c\rangle_{L^2}\ge \frac1c\|\lambda_c\|_{L^2}^2$.
-\item (Uniform bounds) Test $AA^\ast p_c+Az+\lambda_c=0$ with $p_c$ to bound $\|p_c\|_{H_0^2}$ and $\frac1c\|\lambda_c\|_{L^2}^2$.
-\item (Subsequence limits) Extract $(p_c,\lambda_c)\rightharpoonup (\tilde p,\tilde\lambda)$ in $H_0^2\times H_0^2{}^\ast$ (Banach--Alaoglu).
-\item (Feasibility) The penalties $\max(0,p_c-\alpha)$, $\min(0,p_c+\alpha)$ vanish in $L^2$ $\Rightarrow$ $|\tilde p|\le \alpha$ a.e.
-\item (Strong conv.) Use weak l.s.c.\ to get $\|A^\ast p_c\|_{L^2}\to \|A^\ast\tilde p\|_{L^2}$, hence $p_c\to\tilde p$ in $H_0^2$.
-\item (Limit KKT) Limit in the variational inequality to show $(\tilde p,\tilde\lambda)$ solves the unreg. KKT system.
-\item (Uniqueness) Conclude $(\tilde p,\tilde\lambda)=(p^\ast,\lambda^\ast)$ and thus the whole family converges.
+\item \textbf{Key inequality.}
+From the pointwise definition of $\lambda_c$ one obtains $
+\langle \lambda_c,p_c\rangle_{L^2(\Omega)} \;\ge\; \frac1c\|\lambda_c\|_{L^2(\Omega)}^2.$
+
+\item \textbf{Uniform bounds.}
+Test $AA^\ast p_c+Az+\lambda_c=0$ with $p_c$ to get bounds on
+$\|p_c\|_{H_0^2(\Omega)}$ and $\frac1c\|\lambda_c\|_{L^2(\Omega)}^2$.
+
+\item \textbf{Compactness.}
+Extract a subsequence such that
+\[
+p_c \rightharpoonup \tilde p \ \text{in }H_0^2(\Omega),
+\qquad
+\lambda_c \rightharpoonup \tilde\lambda \ \text{in }H_0^2(\Omega)^\ast .
+\]
+
+\item \textbf{Feasibility in the limit.}
+The penalties
+$\max(0,p_c-\alpha)$ and $\min(0,p_c+\alpha)$ vanish in $L^2(\Omega)$ as $c\to\infty$,
+hence $|\tilde p|\le \alpha$ a.e.
+
+\item \textbf{Limit KKT + uniqueness.}
+Pass to the limit in $AA^\ast p_c+Az+\lambda_c=0$ implies that $(\tilde p,\tilde\lambda)$ solves the unregularized KKT system.
 \end{enumerate}
-\end{block}
-
 \end{frame}
-
 
 % ============================================================
 % ALGORITHM: Semismooth Newton 
@@ -453,6 +533,45 @@ A_k := A_k^+\cup A_k^- .
 \end{frame}
 
 \begin{frame}{Experiments | Semiconductor example}
+
+% -------------------- Images (top row) --------------------
+
+
+\vspace{2mm}
+
+% -------------------- Text (bottom row, full width) --------------------
+\small
+\textbf{Design trade-off.}
+When light is absorbed in the semiconductor it generates electron--hole pairs.
+These carriers must be collected at the \textbf{p--n junction} (anode implant) and extracted at the contacts.
+
+\medskip
+A central design objective is to balance:
+\begin{itemize}
+  \item \textbf{Carrier collection efficiency:} the collecting region should be placed/extended such that carriers reach it
+        before recombination or boundary loss.
+  \item \textbf{Capacitance minimization:} the junction capacitance scales approximately with the \textbf{junction area},$C_j \;\propto\; A_{\text{junction}}$, and a larger capacitance reduces bandwidth and increases noise.
+\end{itemize}
+
+\textbf{Goal:} find an optimal junction geometry that achieves \emph{high collection} while keeping the \emph{junction area small}.
+
+\centering
+\begin{minipage}[c]{0.15\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{PD_sketch_side.png}\\[-1mm]
+  {\scriptsize Cross-section (side view)}
+\end{minipage}
+\hspace{0.01\textwidth} % <-- adjust this (smaller = closer)
+\begin{minipage}[c]{0.15\textwidth}
+  \centering
+  \vspace{-0.5cm}
+  \includegraphics[width=\linewidth]{PD_sketch_top.png}\\[-0.5mm]
+  {\scriptsize Top view (layout)}
+\end{minipage}
+
+\end{frame}
+
+\begin{frame}{Experiments | Semiconductor example}
 \small
 \textbf{Context.}
 We consider a steady-state concentration $y$ of a species in a bounded domain $\Omega \subset \mathbb{R}^2$
@@ -489,23 +608,14 @@ Here $\alpha>0$ controls the sparsity strength: larger $\alpha$ yields fewer/str
     
 \small
 
-\textit{Numerical solution on $\Omega=[-1,1]^2$ (Dirichlet BC), $D=0.5$.}
+\textit{Numerical solution on $\Omega=[-1,1]^2$ (Dirichlet BC)}
 
 \vspace{0.3em}
-\includegraphics[width=\linewidth]{result_semic_1.png}
+\includegraphics[width=\linewidth]{result_semic_4.png}
 
-\vspace{-4em}
-The optimized sink $u$ concentrates on a very thin ring surrounding the generation region.
-This structure is a direct consequence of the measure penalty, which promotes sparsity by
-localizing the control on sets of small measure. Despite its narrow support, the sink efficiently
-removes the species due to diffusion, resulting in a low concentration $y$ throughout the domain.
+\parbox{\linewidth}{For low diffusitivity the optimized sink $u$ concentrates on pointlike structures surrounding the generation region. In contrast, in higher diffusivity environments, a ring like structure appears similar like a net for collecting the carriers. This structure is a direct consequence of the measure penalty, which promotes sparsity by
+localizing the control on sets of small measure.}
 \end{frame}
-
-
-\begin{frame}{Experiments | Semiconductor example}
-    
-\end{frame}
-
 
 % ============================================================
 % 17. ALTERNATIVE ROUTE: FEM SEQUEL IDEA
