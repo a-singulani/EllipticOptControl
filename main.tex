@@ -651,9 +651,7 @@ p := S^*w \in H^2(\Omega)\cap H^1_0(\Omega)
 \qquad\text{and}\qquad
 w = A^*p.
 \]
-In particular, $\|w\|_{L^2}=\|A^*p\|_{L^2}$ and $\langle z,w\rangle=\langle z,A^*p\rangle$.
-
-the saddle formulation \eqref{eq:saddle_start} can be rewritten as
+In particular, $\|w\|_{L^2}=\|A^*p\|_{L^2}$ and $\langle z,w\rangle=\langle z,A^*p\rangle$, the saddle formulation \eqref{eq:saddle_start} can be rewritten as
 \begin{equation}\label{eq:inf_sup_step3}
 \inf_{u\in\mathcal{M}(\Omega)}\ \sup_{p\in H^2(\Omega)\cap H^1_0(\Omega)}
 \Bigl[
@@ -664,18 +662,9 @@ the saddle formulation \eqref{eq:saddle_start} can be rewritten as
 \Bigr],
 \end{equation}
 where $\langle u,p\rangle_{\mathcal{M},C_0}:=\int_\Omega p\,du$.
-Equivalently, completing the square in the $p$-dependent quadratic terms yields
-\begin{equation}\label{eq:inf_sup_step3_square}
-\inf_{u\in\mathcal{M}(\Omega)}\ 
-\Bigl[
--\frac12\|A^*p+z\|_{L^2(\Omega)}^2
-+\frac12\|z\|_{L^2(\Omega)}^2
-\Bigr].
-\end{equation}
-
 
 \subsection*{Step 4: Minimize out the measure (conjugate of the measure norm)}
-Next, let $w$ (equivalently $p$) be arbitrary and fixed  in \eqref{eq:saddle_start}. The dependence on $u$ is
+Next, let $w$ (equivalently $p$) be arbitrary and fixed  in \eqref{eq:inf_sup_step3}. The dependence on $u$ is
 \[
 \inf_{u\in\mathcal{M}(\Omega)}
 \Bigl\{ \langle u,p\rangle_{\mathcal{M},C_0} + \alpha\|u\|_{\mathcal{M}} \Bigr\}.
@@ -1769,7 +1758,7 @@ P_\alpha(p):=\max(0,p-\alpha)+\min(0,p+\alpha),
 \end{equation}
 so that $F(p)=AA^\ast p + c\,P_\alpha(p)+Az$.
 
-\paragraph{Semismoothness and Newton derivative (as in the paper).}
+\paragraph{Semismoothness and Newton derivative.}
 It is known (see \cite[Ex.~8.14]{ItoKunisch2008}) that $P_\alpha$ is semismooth from $L^q(\Omega)$ to $L^p(\Omega)$ if $q>p$,
 and that a Newton derivative is given by
 \begin{equation}\label{eq:Newton_derivative_Palpha}
@@ -1812,7 +1801,7 @@ one obtains the linear equation for $p_{k+1}$:
 -Az + c\alpha\,\chi_{A_k^+} - c\alpha\,\chi_{A_k^-}.
 \end{equation}
 
-\paragraph{Weak form (the form used in the paper).}
+\paragraph{Weak form.}
 Testing \eqref{eq:ssn_step_strong} with $v\in H_0^2(\Omega)$ gives:
 find $p_{k+1}\in H_0^2(\Omega)$ such that
 \begin{equation}\label{eq:ssn_step_weak}
@@ -1846,7 +1835,7 @@ A_k^+ := \{p_k>\alpha\},\qquad A_k^- := \{p_k<-\alpha\},\qquad A_k:=A_k^+\cup A_
 \end{algorithm}
 
 \paragraph{Why the stopping criterion makes sense.}
-If the active sets no longer change, the Newton derivative stays the same and the right-hand side in \eqref{eq_ssn_step_weak} is consistent with the nonlinear term.
+If the active sets no longer change, the Newton derivative stays the same and the right-hand side in \eqref{eq:ssn_step_weak} is consistent with the nonlinear term.
 Consequently, the computed iterate already solves the nonlinear equation $F(p)=0$.
 
 \begin{proposition}[Active-set stationarity implies exactness]\label{prop:active_set_stop}
@@ -2005,12 +1994,14 @@ In particular, the convexity, duality arguments, and the predual formulation car
 
 We solved the problem for diffusion coefficients equally spaced in the interval $[0.1,0.6]$. The corresponding optimal controls are shown in Figure~\ref{fig:exp3_reproduction}. A clear trend emerges: the optimal sink geometry adapts systematically to the diffusion strength, i.e., to how rapidly carriers spread across the domain. For small diffusivity, the optimizer favors highly localized, almost point-like sink patterns. This matches the intuition that when particles do not spread far, effective collection is achieved by concentrating the control at a few strategically placed locations. In contrast, for larger diffusivity the optimal control becomes increasingly distributed, forming an extended “net” that intercepts carriers over a wider area before they can reach (and be lost through) the boundary.
 
-\begin{figure}[th!]
+\begin{figure}[p!]
     \centering
     \includegraphics[width=\linewidth]{result_semic_3.png}
     \caption{Experiment 2 : Solution obtained for different diffusion coefficients for a constant illumination area (top left).}
     \label{fig:exp3_reproduction}
 \end{figure}
+
+\newpage
 
 \section{Conclusion}
 

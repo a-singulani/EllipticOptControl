@@ -85,6 +85,7 @@
   \item Optimality conditions and sparsity structure 
   \item Numerics and regularization
   \item Experiments
+  \item Alternative route (optional)
   \item Conclusion
 \end{itemize}
 \end{frame}
@@ -115,12 +116,13 @@ Ay = u \quad \text{in }\Om,\qquad y=0 \quad\text{on }\partial\Om,
 \qquad u\in \M(\Om).
 \]
 
-\begin{block}{Why not the usual $H^1_0$ formulation?}
+\textbf{Why not the usual $H^1_0$ formulation?}\newline
 A general measure $u$ is \emph{not} in $H^{-1}(\Om)$, so
 testing with $v\in H^1_0(\Om)$ is not well-defined.
-\end{block}
 
-\begin{block}{Very weak formulation (Dirichlet)}
+\vspace{1em}
+
+\textbf{Very weak formulation (Dirichlet)} \newline
 Choose a test space $V \hookrightarrow C_0(\Om)$, e.g.
 $V = H^2(\Om)\cap H^1_0(\Om)$ (in $n=2,3$).
 Then there exist $y\in L^1(\Om)$ that solves
@@ -128,33 +130,31 @@ Then there exist $y\in L^1(\Om)$ that solves
 \int_\Om y\, A^\ast \varphi\, dx = \int_\Om \varphi\, du
 \qquad \forall \varphi\in V.
 \]
-\end{block}
+
 \end{frame}
 
 % ============================================================
 % REGULARITY / SOLUTION OPERATOR
 % ============================================================
 \begin{frame}{Setup | Regularity and the solution map}
-\begin{block}{Elliptic smoothing for measure data}
+\textbf{Elliptic smoothing for measure data}\newline
 For $u\in \M(\Om)$, the very weak solution satisfies
 \[
 y \in W^{1,p}_0(\Om)\quad \text{for all } 1\le p < \frac{n}{n-1},
 \qquad
 \norm{y}_{W^{1,p}} \le C \norm{u}_{\M(\Om)}.
 \]
-\end{block}
 
-\begin{block}{Solution operator}
+\textbf{Solution operator} \newline
 Define
 \[
 S:\M(\Om)\to L^2(\Om),\qquad Su = y(u),
 \]
 using Sobolev embedding $W^{1,p}_0(\Om)\hookrightarrow L^2(\Om)$ (for suitable $p$, $n\in\{2,3\}$).
-\end{block}
 
-\begin{alertblock}{Key takeaway}
+\textbf{Key takeaway: }
 Even if $u$ is singular (Dirac), the state $y$ is a genuine function usable in an $L^2$ tracking term.
-\end{alertblock}
+
 \end{frame}
 
 % ============================================================
@@ -529,8 +529,23 @@ A_k := A_k^+\cup A_k^- .
 \end{frame}
 
 \begin{frame}{Experiments | Basic example}
-    
+
+\centering
+\includegraphics[width=\linewidth]{result_basic_1.png}
+
+\vspace{0.6em}
+\small
+\textbf{Qualitative validation.}
+To sanity-check our implementation, we compare the computed control/state patterns
+against the benchmark examples for the square target $z_b$ in Clason--Kunisch (2009). 
+\begin{itemize}\itemsep0.2em
+\item the optimal control concentrates on a thin ring near the interface of the target set,
+\item the resulting state reproduces the plateau inside the target with a smooth transition layer near the boundary,
+\item corner effects and sign changes align with the qualitative patterns reported in the reference.
+\end{itemize}
+
 \end{frame}
+
 
 \begin{frame}{Experiments | Semiconductor example}
 
@@ -620,17 +635,15 @@ localizing the control on sets of small measure.}
 % ============================================================
 % 17. ALTERNATIVE ROUTE: FEM SEQUEL IDEA
 % ============================================================
-\begin{frame}{Alternative numerical route: variational discretization (FEM sequel)}
-\begin{block}{Different philosophy}
+\begin{frame}{Alternative numerical route: variational discretization (SparseFEM)}
+\textbf{Different "philosophy"}
 Discretize only the \emph{state} equation by FEM, keep $u\in\M(\Om)$ continuous.
-\end{block}
 
-\begin{block}{Key theorem (informal)}
+\textbf{Key theorem (informal)}
 The discrete optimizer can be chosen as a \emph{finite combination of Diracs at mesh nodes}:
 \[
 u_h^\ast = \sum_{j=1}^{N(h)} \lambda_j \delta_{x_j}.
 \]
-\end{block}
 
 \begin{alertblock}{Comparison}
 \begin{itemize}
