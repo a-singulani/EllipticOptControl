@@ -558,7 +558,7 @@ u_n \xrightharpoonup{*} u^* \quad \text{in } \sigma(\mathcal{M}(\Omega),C_0(\Ome
 
 \textbf{Step 2: Compactness of states.}
 Let $y_n:=y(u_n)$.
-By the elliptic well-posedness in the very weak setting (Section~\ref{sec:veryweak_vs_dist}),
+By the elliptic well-posedness in the very weak setting (Section~\ref{sec:pde_measures}),
 the sequence $(y_n)$ is bounded in $W^{1,p}_0(\Omega)$ for every $1\le p<\frac{n}{n-1}$.
 Since $W^{1,p}_0(\Omega)\hookrightarrow L^2(\Omega)$ compactly for $n\in\{2,3\}$ and such $p$,
 there exists a further subsequence and $y^*\in L^2(\Omega)$ such that
@@ -568,7 +568,7 @@ y_n \to y^* \quad \text{strongly in } L^2(\Omega).
 
 \textbf{Step 3: Passage to the limit in the state equation.}
 Let $\mathcal{V}\subset C_0(\Omega)$ be the test space used in the definition of very weak solution
-(e.g.\ $\mathcal{V}=H^2(\Omega)\cap H^1_0(\Omega)$, cf.\ Remark~\ref{rem:V_into_C0}).
+(e.g.\ $\mathcal{V}=H^2(\Omega)\cap H^1_0(\Omega)$).
 For every $\varphi\in\mathcal{V}$ the very weak formulation reads
 \[
 \int_\Omega y_n\, A^*\varphi\,dx \;=\; \int_\Omega \varphi\,du_n.
@@ -816,7 +816,7 @@ Equivalently,
 This is the normal-cone (variational inequality) form of the extremality relation.
 
 \paragraph{Step 3: Identification of the KKT multiplier.}
-Comparing \eqref{eq:KKT_predual_multiplier} with \eqref{eq:E2_normal_cone_again}, we see that the
+Comparing \eqref{eq:kkt_inclusion} with \eqref{eq:E2_normal_cone_again}, we see that the
 normal cone element produced by the $u$-minimization is precisely $-u^*$.
 Therefore one may choose the KKT multiplier in \eqref{eq:kkt_inclusion} as
 \begin{equation}\label{eq:lambda_equals_minus_u}
@@ -942,10 +942,10 @@ u^* \le 0 \ \text{on } \{p^*=-\alpha\},
 in the sense of measures. In summary
 
 \begin{theorem}[Sparsity property.]
-Let $p\in C_c(\Omega)$ with $\psi\ge 0$. Then:
+Let $\psi \in C_0(\Omega)$ with $p \ge 0$. Then:
 \begin{align*}
 &\langle u^*,p\rangle=0
-\quad\text{if }\operatorname{supp}p\subset\{x:\ |p^*(x)|<\alpha\},
+\quad\text{if }\operatorname{supp}\psi\subset\{x:\ |p^*(x)|<\alpha\},
 \\
 &\langle u^*,p\rangle\ge 0
 \quad\text{if }\operatorname{supp}p\subset\{x:\ p^*(x)=\alpha\},
@@ -1503,7 +1503,7 @@ introduces sparse point actuators.
 
 
 \section{Numerics}
-\label{seq:numerics}
+\label{sec:numerics}
 
 In the predual formulation for measure controls \eqref{eq:PM_star}
 the constraint is a pointwise \emph{box constraint} on the dual variable $p$, i.e.\ $-\alpha\le p(x)\le \alpha$ for all $x\in\Omega$
@@ -1605,7 +1605,7 @@ Using the first equation again,
 \sup_{\|v\|_{H^2_0}\le 1} \bigl(\langle A^\ast p_c, A^\ast v\rangle + \langle z, A^\ast v\rangle \bigr)
 \le K,
 \]
-for some constant $K$ independent of $c$ (here we use the norm equivalence assumption for $A^\ast$ on $H^2_0(\Omega)$ as in the paper).
+for some constant $K$ independent of $c$ (here we use the norm equivalence assumption for $A^\ast$ on $H^2_0(\Omega)$).
 Thus $(p_c,\lambda_c)$ is uniformly bounded in $H^2_0(\Omega)\times H^2_0(\Omega)^\ast$.
 
 \medskip\noindent
