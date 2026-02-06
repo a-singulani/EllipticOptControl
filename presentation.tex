@@ -250,7 +250,8 @@ Avoid discretizing measures directly and replace nonsmooth penalty by a simple c
 \begin{block}{Core idea (Fenchel duality)}
 The conjugate of $\alpha\norm{\cdot}_\M$ is the indicator of a box in $C_0(\Om)$:
 \[
-(\alpha\norm{\cdot}_\M)^\ast(\varphi)
+(\alpha\norm{\cdot}_\M)^\ast(\varphi) = \sup_{u\in\mathcal M(\Omega)}\{\langle u,p\rangle-\alpha\|u\|_{\mathcal M}\} 
+=  I_{\{\|\phi\|_{X^*}\le \alpha\}}(p)
 =
 \begin{cases}
 0, & \norm{\varphi}_\infty \le \alpha,\\
@@ -403,19 +404,19 @@ u^\ast := -\lambda^\ast \in \M(\Omega).
 
 \medskip
 \textbf{Support / sparsity (inactive set):}
-for $\psi\in C_c(\Omega)$, $\psi\ge0$,
+for $p\in C_0(\Omega)$, $p\ge0$,
 \[
-\supp(\psi)\subset\{|p^\ast|<\alpha\}
+\supp(p)\subset\{|p^\ast|<\alpha\}
 \quad\Longrightarrow\quad
-\langle u^\ast,\psi\rangle=0.
+\langle u^\ast,p\rangle=0.
 \]
 
 \medskip
 \textbf{Sign on the active set:}
 \[
-\supp(\psi)\subset\{p^\ast=\alpha\}\Rightarrow \langle u^\ast,\psi\rangle\ge0,
+\supp(p)\subset\{p^\ast=\alpha\}\Rightarrow \langle u^\ast,p\rangle\ge0,
 \qquad
-\supp(\psi)\subset\{p^\ast=-\alpha\}\Rightarrow \langle u^\ast,\psi\rangle\le0.
+\supp(p)\subset\{p^\ast=-\alpha\}\Rightarrow \langle u^\ast,p\rangle\le0.
 \]
 
 \medskip
@@ -497,7 +498,7 @@ Pass to the limit in $AA^\ast p_c+Az+\lambda_c=0$ implies that $(\tilde p,\tilde
 \vspace{-1mm}
 
 \begin{block}{Goal}
-Solve the regularized optimality system $F(p)=0$ for $p_c\in H_0^2(\Omega)$
+Solve the regularized optimality system $F(p)= AA^\ast p+Az+\max(0,c(p-\alpha))+\min(0,c(p+\alpha)) =0$ for $p\in H_0^2(\Omega)$
 via an active-set (piecewise linear) Newton iteration.
 \end{block}
 
