@@ -95,12 +95,13 @@
 % ============================================================
 \begin{frame}{Motivation: why measure-valued controls?}
 
-Desired properties 
-\begin{itemize}
-  \item \textbf{Localized actuation:} heating spots, micro-heaters, point electrodes, concentrated loads.
+Many optimization problems requires \textbf{localized actuation}, for example, heating spots, micro-heaters, point electrodes, concentrated loads. Thus, we need
+\begin{itemize}  
   \item \textbf{Natural model:} point sources $\approx$ Dirac measures $\Rightarrow u\in\mathcal M(\Omega)$.
   \item \textbf{Sparsity:} $L^1$-type penalties promote concentrated/active-set solutions.
 \end{itemize}
+
+
 
 \medskip
 \textbf{Main challenge:} nonsmooth cost in a nonreflexive space.
@@ -125,7 +126,7 @@ testing with $v\in H^1_0(\Om)$ is not well-defined.
 \textbf{Very weak formulation (Dirichlet)} \newline
 Choose a test space $V \hookrightarrow C_0(\Om)$, e.g.
 $V = H^2(\Om)\cap H^1_0(\Om)$ (in $n=2,3$).
-Then there exist $y\in L^1(\Om)$ that solves
+Then $y\in L^1(\Om)$ is a very weak solution if it solves
 \[
 \int_\Om y\, A^\ast \varphi\, dx = \int_\Om \varphi\, du
 \qquad \forall \varphi\in V.
@@ -229,7 +230,7 @@ Su_n \to Su^\ast \text{ in }L^2(\Omega)
 \quad\text{(Rellich)}.
 \]
 Lower semicontinuity of $\|\cdot\|_{\M}$ gives
-$\|u^\ast\|_{\M}\le\liminf_n\|u_n\|_{\M}$, so $u^\ast$ is optimal.
+$\|u^\ast\|_{\M}\le\liminf_{n\to\infty}\|u_n\|_{\M}$, so $u^\ast$ is optimal.
 
 \medskip
 \textbf{Uniqueness.}
