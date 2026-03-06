@@ -63,7 +63,7 @@
 \subtitle{Predual reformulation, sparsity, and semismooth Newton numerics}
 \author{Anderson Singulani}
 \institute{Seminar}
-\date{January 21, 2026}
+\date{\today}
 
 \begin{document}
 
@@ -85,7 +85,6 @@
   \item Optimality conditions and sparsity structure 
   \item Numerics and regularization
   \item Experiments
-  \item Alternative route (optional)
   \item Conclusion
 \end{itemize}
 \end{frame}
@@ -406,7 +405,7 @@ u^\ast := -\lambda^\ast \in \M(\Omega).
 \textbf{Support / sparsity (inactive set):}
 for $p\in C_0(\Omega)$, $p\ge0$,
 \[
-\supp(p)\subset\{|p^\ast|<\alpha\}
+\supp(p)\subset\{x \in \Omega | |p^\ast(x)|<\alpha\}
 \quad\Longrightarrow\quad
 \langle u^\ast,p\rangle=0.
 \]
@@ -414,9 +413,9 @@ for $p\in C_0(\Omega)$, $p\ge0$,
 \medskip
 \textbf{Sign on the active set:}
 \[
-\supp(p)\subset\{p^\ast=\alpha\}\Rightarrow \langle u^\ast,p\rangle\ge0,
+\supp(p)\subset\{x \in \Omega | p^\ast(x)=\alpha\}\Rightarrow \langle u^\ast,p\rangle\ge0,
 \qquad
-\supp(p)\subset\{p^\ast=-\alpha\}\Rightarrow \langle u^\ast,p\rangle\le0.
+\supp(p)\subset\{x \in \Omega | p^\ast(x)=-\alpha\}\Rightarrow \langle u^\ast,p\rangle\le0.
 \]
 
 \medskip
@@ -637,23 +636,23 @@ localizing the control on sets of small measure.}
 % ============================================================
 % 17. ALTERNATIVE ROUTE: FEM SEQUEL IDEA
 % ============================================================
-\begin{frame}{Alternative numerical route: variational discretization (SparseFEM)}
-\textbf{Different "philosophy"}
-Discretize only the \emph{state} equation by FEM, keep $u\in\M(\Om)$ continuous.
+%\begin{frame}{Alternative numerical route: variational discretization (SparseFEM)}
+%\textbf{Different "philosophy"}
+%Discretize only the \emph{state} equation by FEM, keep $u\in\M(\Om)$ continuous.
 
-\textbf{Key theorem (informal)}
-The discrete optimizer can be chosen as a \emph{finite combination of Diracs at mesh nodes}:
-\[
-u_h^\ast = \sum_{j=1}^{N(h)} \lambda_j \delta_{x_j}.
-\]
+%\textbf{Key theorem (informal)}
+%The discrete optimizer can be chosen as a \emph{finite combination of Diracs at mesh nodes}:
+%\[
+%u_h^\ast = \sum_{j=1}^{N(h)} \lambda_j \delta_{x_j}.
+%\]
 
-\begin{alertblock}{Comparison}
-\begin{itemize}
-  \item Predual approach: smooth variable + box constraints + Newton
-  \item FEM sequel: state discretization induces nodal sparsity automatically
-\end{itemize}
-\end{alertblock}
-\end{frame}
+%\begin{alertblock}{Comparison}
+%\begin{itemize}
+%  \item Predual approach: smooth variable + box constraints + Newton
+%  \item FEM sequel: state discretization induces nodal sparsity automatically
+%\end{itemize}
+%\end{alertblock}
+%\end{frame}
 
 % ============================================================
 % 18. CONCLUSION
